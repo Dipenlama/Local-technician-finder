@@ -13,7 +13,29 @@ abstract final class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: const Color(0xFFF7F8FC),
-      appBarTheme: const AppBarTheme(centerTitle: false),
+      fontFamily: 'Roboto',
+      appBarTheme: const AppBarTheme(
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(54),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size.fromHeight(54),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -26,6 +48,10 @@ abstract final class AppTheme {
         elevation: 0,
         color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      navigationBarTheme: const NavigationBarThemeData(
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
     );
   }

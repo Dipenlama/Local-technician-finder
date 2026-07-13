@@ -35,7 +35,8 @@ class TechnicianCard extends StatelessWidget {
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                      const Icon(Icons.star_rounded,
+                          color: Colors.amber, size: 20),
                       Text(' ${technician.rating} (${technician.reviewCount})'),
                     ],
                   ),
@@ -53,7 +54,9 @@ class TechnicianCard extends StatelessWidget {
               child: Text(
                 technician.isAvailable ? 'Available' : 'Busy',
                 style: TextStyle(
-                  color: technician.isAvailable ? Colors.green.shade700 : Colors.grey,
+                  color: technician.isAvailable
+                      ? Colors.green.shade700
+                      : Colors.grey,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
