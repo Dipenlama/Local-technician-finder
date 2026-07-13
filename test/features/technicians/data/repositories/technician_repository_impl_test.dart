@@ -8,13 +8,13 @@ void main() {
   test('returns every technician when the search is empty', () async {
     final result = await repository.getTechnicians();
 
-    expect(result, hasLength(4));
+    expect(result, hasLength(10));
   });
 
   test('filters technicians by profession', () async {
     final result = await repository.getTechnicians(query: 'plumber');
 
-    expect(result, hasLength(1));
-    expect(result.single.name, 'Sita Rai');
+    expect(result, hasLength(2));
+    expect(result.map((technician) => technician.name), contains('Sita Rai'));
   });
 }

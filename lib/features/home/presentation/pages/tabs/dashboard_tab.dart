@@ -3,26 +3,58 @@ import 'package:mistrix/core/widgets/mistrix_logo.dart';
 import 'package:mistrix/features/home/presentation/widgets/service_category.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
+import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 
 class DashboardTab extends StatelessWidget {
   const DashboardTab({
     required this.controller,
     required this.onExplore,
+    required this.onServiceSelected,
+    required this.onBook,
     super.key,
   });
 
   final TechnicianController controller;
   final VoidCallback onExplore;
+  final ValueChanged<ServiceCategoryData> onServiceSelected;
+  final ValueChanged<Technician> onBook;
 
   static const _categories = [
     ServiceCategoryData(
-        'Electrician', Icons.electrical_services_rounded, Color(0xFFFFB547)),
-    ServiceCategoryData('Plumber', Icons.plumbing_rounded, Color(0xFF4A90E2)),
-    ServiceCategoryData('AC Repair', Icons.ac_unit_rounded, Color(0xFF00A8A8)),
-    ServiceCategoryData('Computer', Icons.computer_rounded, Color(0xFF8B5CF6)),
+      label: 'Electrician',
+      query: 'Electrician',
+      icon: Icons.electrical_services_rounded,
+      color: Color(0xFFFFB547),
+    ),
     ServiceCategoryData(
-        'Carpenter', Icons.carpenter_rounded, Color(0xFFE46D5C)),
-    ServiceCategoryData('More', Icons.grid_view_rounded, Color(0xFF637083)),
+      label: 'Plumber',
+      query: 'Plumber',
+      icon: Icons.plumbing_rounded,
+      color: Color(0xFF4A90E2),
+    ),
+    ServiceCategoryData(
+      label: 'AC Repair',
+      query: 'AC Technician',
+      icon: Icons.ac_unit_rounded,
+      color: Color(0xFF00A8A8),
+    ),
+    ServiceCategoryData(
+      label: 'Computer',
+      query: 'Computer Repair',
+      icon: Icons.computer_rounded,
+      color: Color(0xFF8B5CF6),
+    ),
+    ServiceCategoryData(
+      label: 'Carpenter',
+      query: 'Carpenter',
+      icon: Icons.carpenter_rounded,
+      color: Color(0xFFE46D5C),
+    ),
+    ServiceCategoryData(
+      label: 'More',
+      icon: Icons.grid_view_rounded,
+      color: Color(0xFF637083),
+    ),
   ];
 
   @override
@@ -140,8 +172,10 @@ class DashboardTab extends StatelessWidget {
                   crossAxisSpacing: 12,
                   childAspectRatio: 0.92,
                 ),
-                itemBuilder: (context, index) =>
-                    ServiceCategory(data: _categories[index]),
+                itemBuilder: (context, index) => ServiceCategory(
+                  data: _categories[index],
+                  onTap: () => onServiceSelected(_categories[index]),
+                ),
               ),
             ),
             SliverPadding(
@@ -170,6 +204,7 @@ class DashboardTab extends StatelessWidget {
                     itemCount: controller.technicians.take(3).length,
                     itemBuilder: (context, index) => TechnicianCard(
                       technician: controller.technicians[index],
+                      onBook: () => onBook(controller.technicians[index]),
                     ),
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                   ),

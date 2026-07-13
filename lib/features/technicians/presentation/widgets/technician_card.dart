@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 
 class TechnicianCard extends StatelessWidget {
-  const TechnicianCard({required this.technician, super.key});
+  const TechnicianCard({
+    required this.technician,
+    this.onBook,
+    super.key,
+  });
 
   final Technician technician;
+  final VoidCallback? onBook;
 
   @override
   Widget build(BuildContext context) {
@@ -43,24 +48,42 @@ class TechnicianCard extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: technician.isAvailable
-                    ? Colors.green.withValues(alpha: 0.12)
-                    : Colors.grey.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                technician.isAvailable ? 'Available' : 'Busy',
-                style: TextStyle(
-                  color: technician.isAvailable
-                      ? Colors.green.shade700
-                      : Colors.grey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: technician.isAvailable
+                        ? Colors.green.withValues(alpha: 0.12)
+                        : Colors.grey.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    technician.isAvailable ? 'Available' : 'Busy',
+                    style: TextStyle(
+                      color: technician.isAvailable
+                          ? Colors.green.shade700
+                          : Colors.grey,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
+                if (onBook != null && technician.isAvailable) ...[
+                  const SizedBox(height: 8),
+                  FilledButton(
+                    onPressed: onBook,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(74, 34),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: const Text('Book'),
+                  ),
+                ],
+              ],
             ),
           ],
         ),

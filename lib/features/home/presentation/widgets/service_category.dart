@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 class ServiceCategory extends StatelessWidget {
-  const ServiceCategory({required this.data, super.key});
+  const ServiceCategory({
+    required this.data,
+    required this.onTap,
+    super.key,
+  });
 
   final ServiceCategoryData data;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Ink(
         padding: const EdgeInsets.all(10),
@@ -42,9 +47,15 @@ class ServiceCategory extends StatelessWidget {
 }
 
 class ServiceCategoryData {
-  const ServiceCategoryData(this.label, this.icon, this.color);
+  const ServiceCategoryData({
+    required this.label,
+    required this.icon,
+    required this.color,
+    this.query,
+  });
 
   final String label;
   final IconData icon;
   final Color color;
+  final String? query;
 }

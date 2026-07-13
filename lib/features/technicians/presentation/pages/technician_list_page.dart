@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
+import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 
 class TechnicianListPage extends StatefulWidget {
   const TechnicianListPage({
     required this.controller,
     this.embedded = false,
+    this.onBook,
     super.key,
   });
 
   final TechnicianController controller;
   final bool embedded;
+  final ValueChanged<Technician>? onBook;
 
   @override
   State<TechnicianListPage> createState() => _TechnicianListPageState();
@@ -107,7 +110,13 @@ class _TechnicianListPageState extends State<TechnicianListPage> {
           itemCount: controller.technicians.length,
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
-            return TechnicianCard(technician: controller.technicians[index]);
+            final technician = controller.technicians[index];
+            return TechnicianCard(
+              technician: technician,
+              onBook: widget.onBook == null
+                  ? null
+                  : () => widget.onBook!(technician),
+            );
           },
         ),
     };

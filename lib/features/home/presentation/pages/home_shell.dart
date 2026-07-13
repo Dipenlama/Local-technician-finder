@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
+import 'package:mistrix/features/bookings/presentation/pages/create_booking_page.dart';
 import 'package:mistrix/features/home/presentation/pages/tabs/bookings_tab.dart';
 import 'package:mistrix/features/home/presentation/pages/tabs/dashboard_tab.dart';
 import 'package:mistrix/features/home/presentation/pages/tabs/profile_tab.dart';
+import 'package:mistrix/features/home/presentation/widgets/service_category.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/pages/technician_list_page.dart';
+import 'package:mistrix/features/technicians/presentation/pages/service_technicians_page.dart';
+import 'package:mistrix/features/technicians/domain/use_cases/get_technicians.dart';
+import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({
     required this.technicianController,
+    required this.bookingController,
+    required this.getTechnicians,
     required this.onLogout,
     super.key,
   });
 
   final TechnicianController technicianController;
+  final BookingController bookingController;
+  final GetTechnicians getTechnicians;
   final VoidCallback onLogout;
 
   @override
@@ -28,10 +38,15 @@ class _HomeShellState extends State<HomeShell> {
       DashboardTab(
         controller: widget.technicianController,
         onExplore: () => setState(() => _selectedIndex = 1),
+        onServiceSelected: _openService,
+        onBook: _openBooking,
       ),
       TechnicianListPage(
-          controller: widget.technicianController, embedded: true),
-      const BookingsTab(),
+        controller: widget.technicianController,
+        embedded: true,
+        onBook: _openBooking,
+      ),
+      BookingsTab(controller: widget.bookingController),
       ProfileTab(onLogout: widget.onLogout),
     ];
 
@@ -65,5 +80,39 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
     );
+  }
+
+  void _openService(ServiceCategoryData service) {
+    if (service.query == null) {
+      widget.technicianController.load();
+      setState(() => _selectedIndex = 1);
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => ServiceTechniciansPage(
+          serviceName: service.label,
+          query: service.query!,
+          getTechnicians: widget.getTechnicians,
+          onBook: _openBooking,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openBooking(Technician technician) async {
+    final successful = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (context) => CreateBookingPage(
+          technician: technician,
+          controller: widget.bookingController,
+        ),
+      ),
+    );
+    if (!mounted || successful != true) return;
+
+    setState(() => _selectedIndex = 2);
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 }

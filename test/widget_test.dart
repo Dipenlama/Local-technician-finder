@@ -27,5 +27,14 @@ void main() {
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Bookings'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -350));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Electrician'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Electrician technicians'), findsOneWidget);
+    expect(find.text('Aarav Sharma'), findsOneWidget);
+    expect(find.text('Anita Maharjan'), findsOneWidget);
   });
 }
