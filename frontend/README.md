@@ -33,6 +33,14 @@ flutter pub get
 flutter run
 ```
 
+The default API URLs are `http://10.0.2.2:8080/api/v1` on the Android emulator
+and `http://localhost:8080/api/v1` on web/iOS/desktop. Override this for a real
+phone or deployed API:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://YOUR_COMPUTER_IP:8080/api/v1
+```
+
 ## Backend
 
 The Dart REST API is in `../backend`. See `../backend/README.md` for its setup and

@@ -4,7 +4,12 @@ import 'package:mistrix/features/auth/presentation/widgets/auth_scaffold.dart';
 class SignupPage extends StatefulWidget {
   const SignupPage({required this.onSignup, super.key});
 
-  final VoidCallback onSignup;
+  final Future<String?> Function(
+    String name,
+    String email,
+    String phone,
+    String password,
+  ) onSignup;
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -12,8 +17,22 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _acceptTerms = false;
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +46,7 @@ class _SignupPageState extends State<SignupPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
+              controller: _nameController,
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
                 labelText: 'Full name',
@@ -38,6 +58,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
                 labelText: 'Email address',
@@ -49,6 +70,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _phoneController,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
                 labelText: 'Phone number',
@@ -60,6 +82,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _passwordController,
               obscureText: _obscurePassword,
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -88,8 +111,13 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: _submit,
-              child: const Text('Create account'),
+              onPressed: _isSubmitting ? null : _submit,
+              child: _isSubmitting
+                  ? const SizedBox.square(
+                      dimension: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Create account'),
             ),
             const SizedBox(height: 12),
             TextButton(
@@ -102,7 +130,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -110,6 +138,19 @@ class _SignupPageState extends State<SignupPage> {
       );
       return;
     }
-    widget.onSignup();
+    setState(() => _isSubmitting = true);
+    final error = await widget.onSignup(
+      _nameController.text.trim(),
+      _emailController.text.trim().toLowerCase(),
+      _phoneController.text.trim(),
+      _passwordController.text,
+    );
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
   }
 }

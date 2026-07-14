@@ -10,6 +10,7 @@ class AdminController extends ChangeNotifier {
   final AdminRepository _repository;
 
   bool isLoading = false;
+  String? errorMessage;
   List<AdminService> services = const [];
   List<Technician> technicians = const [];
   List<AdminClient> clients = const [];
@@ -17,11 +18,27 @@ class AdminController extends ChangeNotifier {
   Future<void> load() async {
     isLoading = true;
     notifyListeners();
-    services = await _repository.getServices();
-    technicians = await _repository.getTechnicians();
-    clients = await _repository.getClients();
-    isLoading = false;
-    notifyListeners();
+    try {
+      errorMessage = null;
+      services = await _repository.getServices();
+      technicians = await _repository.getTechnicians();
+      clients = await _repository.getClients();
+    } on Exception catch (error) {
+      errorMessage = error.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadServices() async {
+    try {
+      services = await _repository.getServices();
+    } on Exception catch (error) {
+      errorMessage = error.toString();
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<void> saveService(AdminService service) async {

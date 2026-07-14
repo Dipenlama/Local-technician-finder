@@ -191,7 +191,10 @@ class DashboardTab extends StatelessWidget {
   }
 
   List<ServiceCategoryData> _serviceCategories() {
-    final categories = adminController.services
+    final services = adminController.services.isEmpty
+        ? _defaultServices
+        : adminController.services;
+    final categories = services
         .where((service) => service.isActive)
         .take(5)
         .map(_categoryFromService)
@@ -205,6 +208,44 @@ class DashboardTab extends StatelessWidget {
     );
     return categories;
   }
+
+  static const _defaultServices = [
+    AdminService(
+      id: 'service-001',
+      name: 'Electrician',
+      description: '',
+      basePrice: 850,
+      isActive: true,
+    ),
+    AdminService(
+      id: 'service-002',
+      name: 'Plumber',
+      description: '',
+      basePrice: 750,
+      isActive: true,
+    ),
+    AdminService(
+      id: 'service-003',
+      name: 'AC Repair',
+      description: '',
+      basePrice: 1000,
+      isActive: true,
+    ),
+    AdminService(
+      id: 'service-004',
+      name: 'Computer Repair',
+      description: '',
+      basePrice: 1200,
+      isActive: true,
+    ),
+    AdminService(
+      id: 'service-005',
+      name: 'Carpenter',
+      description: '',
+      basePrice: 900,
+      isActive: true,
+    ),
+  ];
 
   ServiceCategoryData _categoryFromService(AdminService service) {
     final name = service.name.toLowerCase();
@@ -224,7 +265,10 @@ class DashboardTab extends StatelessWidget {
       Color(0xFF8B5CF6),
       Color(0xFFE46D5C),
     ];
-    final index = adminController.services.indexOf(service);
+    final source = adminController.services.isEmpty
+        ? _defaultServices
+        : adminController.services;
+    final index = source.indexOf(service);
     return ServiceCategoryData(
       label: service.name,
       query: name.contains('ac repair') ? 'AC Technician' : service.name,

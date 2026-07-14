@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/core/theme/app_theme.dart';
 import 'package:mistrix/core/constants/app_constants.dart';
+import 'package:mistrix/core/errors/app_exception.dart';
 import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/admin/presentation/pages/admin_shell.dart';
 import 'package:mistrix/features/auth/presentation/pages/login_page.dart';
@@ -35,8 +36,10 @@ class _MistrixAppState extends State<MistrixApp> {
       widget.dependencies.createBooking,
       widget.dependencies.getBookings,
     )..load();
-    _adminController = AdminController(widget.dependencies.adminRepository)
-      ..load();
+    _adminController = AdminController(widget.dependencies.adminRepository);
+    if (widget.dependencies.authApiService == null) {
+      _adminController.load();
+    }
   }
 
   @override
@@ -75,13 +78,15 @@ class _MistrixAppState extends State<MistrixApp> {
   void _openSignup() {
     _navigatorKey.currentState!.push(
       MaterialPageRoute<void>(
-        builder: (context) => SignupPage(onSignup: _openHome),
+        builder: (context) => SignupPage(onSignup: _handleSignup),
       ),
     );
   }
 
   void _openHome() {
     _controller.load();
+    _bookingController.load();
+    _adminController.loadServices();
     _navigatorKey.currentState!.pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (context) => HomeShell(
@@ -96,13 +101,51 @@ class _MistrixAppState extends State<MistrixApp> {
     );
   }
 
-  void _handleLogin(String email, String password) {
-    if (email == AppConstants.adminEmail &&
-        password == AppConstants.adminPassword) {
-      _openAdmin();
-      return;
+  Future<String?> _handleLogin(String email, String password) async {
+    try {
+      final authApi = widget.dependencies.authApiService;
+      if (authApi == null) {
+        if (email == AppConstants.adminEmail &&
+            password == AppConstants.adminPassword) {
+          _openAdmin();
+        } else {
+          _openHome();
+        }
+        return null;
+      }
+      final session = await authApi.login(email, password);
+      if (session.role == 'admin') {
+        _openAdmin();
+      } else {
+        _openHome();
+      }
+      return null;
+    } on AppException catch (error) {
+      return error.message;
     }
-    _openHome();
+  }
+
+  Future<String?> _handleSignup(
+    String name,
+    String email,
+    String phone,
+    String password,
+  ) async {
+    try {
+      final authApi = widget.dependencies.authApiService;
+      if (authApi != null) {
+        await authApi.signup(
+          name: name,
+          email: email,
+          phone: phone,
+          password: password,
+        );
+      }
+      _openHome();
+      return null;
+    } on AppException catch (error) {
+      return error.message;
+    }
   }
 
   void _openAdmin() {

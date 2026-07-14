@@ -66,6 +66,30 @@ class AdminDashboardTab extends StatelessWidget {
                   'Manage the Mistrix marketplace from one place.',
                   style: TextStyle(color: Colors.blueGrey.shade600),
                 ),
+                if (controller.errorMessage != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Some admin data could not be loaded. Pull down to retry.',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 GridView.count(
                   crossAxisCount: 2,

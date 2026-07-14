@@ -84,7 +84,10 @@ class _BookingsTabState extends State<BookingsTab> {
     }
 
     final bookings = widget.controller.bookings
-        .where((booking) => booking.status == _selectedStatus)
+        .where((booking) => _selectedStatus == BookingStatus.confirmed
+            ? booking.status == BookingStatus.pending ||
+                booking.status == BookingStatus.confirmed
+            : booking.status == _selectedStatus)
         .toList(growable: false);
     if (bookings.isEmpty) return _EmptyBookings(status: _selectedStatus);
 
@@ -107,6 +110,11 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = booking.technicianName.trim().isEmpty
+        ? 'Technician'
+        : booking.technicianName;
+    final isPending = booking.status == BookingStatus.pending;
+    final statusColor = isPending ? Colors.orange : Colors.green;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -117,7 +125,7 @@ class _BookingCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   child: Text(
-                    booking.technicianName.substring(0, 1),
+                    displayName.substring(0, 1),
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
@@ -127,7 +135,7 @@ class _BookingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking.technicianName,
+                        displayName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -141,13 +149,15 @@ class _BookingCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.12),
+                    color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     booking.status.name,
                     style: TextStyle(
-                      color: Colors.green.shade700,
+                      color: isPending
+                          ? Colors.orange.shade800
+                          : Colors.green.shade700,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
@@ -225,6 +235,7 @@ class _EmptyBookings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = switch (status) {
+      BookingStatus.pending => 'No pending bookings',
       BookingStatus.confirmed => 'No upcoming bookings',
       BookingStatus.completed => 'No completed bookings',
       BookingStatus.cancelled => 'No cancelled bookings',

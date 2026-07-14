@@ -9,7 +9,7 @@ class LoginPage extends StatefulWidget {
     super.key,
   });
 
-  final void Function(String email, String password) onLogin;
+  final Future<String?> Function(String email, String password) onLogin;
   final VoidCallback onCreateAccount;
 
   @override
@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = true;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -100,8 +101,13 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 14),
             FilledButton(
-              onPressed: _submit,
-              child: const Text('Sign in'),
+              onPressed: _isSubmitting ? null : _submit,
+              child: _isSubmitting
+                  ? const SizedBox.square(
+                      dimension: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Sign in'),
             ),
             const SizedBox(height: 14),
             Container(
@@ -145,12 +151,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      widget.onLogin(
+      setState(() => _isSubmitting = true);
+      final error = await widget.onLogin(
         _emailController.text.trim().toLowerCase(),
         _passwordController.text,
       );
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      }
     }
   }
 }

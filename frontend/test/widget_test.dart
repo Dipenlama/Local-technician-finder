@@ -5,7 +5,9 @@ import 'package:mistrix/injection_container.dart';
 
 void main() {
   testWidgets('shows the Mistrix onboarding page', (tester) async {
-    await tester.pumpWidget(MistrixApp(dependencies: configureDependencies()));
+    await tester.pumpWidget(
+      MistrixApp(dependencies: configureDependencies(useRemote: false)),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('mistrix'), findsOneWidget);
@@ -14,7 +16,9 @@ void main() {
   });
 
   testWidgets('can sign in and open the home navigation', (tester) async {
-    await tester.pumpWidget(MistrixApp(dependencies: configureDependencies()));
+    await tester.pumpWidget(
+      MistrixApp(dependencies: configureDependencies(useRemote: false)),
+    );
     await tester.tap(find.text('Skip'));
     await tester.pumpAndSettle();
 
@@ -39,7 +43,9 @@ void main() {
   });
 
   testWidgets('admin credentials open the admin dashboard', (tester) async {
-    await tester.pumpWidget(MistrixApp(dependencies: configureDependencies()));
+    await tester.pumpWidget(
+      MistrixApp(dependencies: configureDependencies(useRemote: false)),
+    );
     await tester.tap(find.text('Skip'));
     await tester.pumpAndSettle();
 
