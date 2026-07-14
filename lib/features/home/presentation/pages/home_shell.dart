@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/bookings/presentation/pages/create_booking_page.dart';
 import 'package:mistrix/features/home/presentation/pages/tabs/bookings_tab.dart';
@@ -15,6 +16,7 @@ class HomeShell extends StatefulWidget {
   const HomeShell({
     required this.technicianController,
     required this.bookingController,
+    required this.adminController,
     required this.getTechnicians,
     required this.onLogout,
     super.key,
@@ -22,6 +24,7 @@ class HomeShell extends StatefulWidget {
 
   final TechnicianController technicianController;
   final BookingController bookingController;
+  final AdminController adminController;
   final GetTechnicians getTechnicians;
   final VoidCallback onLogout;
 
@@ -37,6 +40,7 @@ class _HomeShellState extends State<HomeShell> {
     final pages = [
       DashboardTab(
         controller: widget.technicianController,
+        adminController: widget.adminController,
         onExplore: () => setState(() => _selectedIndex = 1),
         onServiceSelected: _openService,
         onBook: _openBooking,

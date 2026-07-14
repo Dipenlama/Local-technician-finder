@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/constants/app_constants.dart';
 import 'package:mistrix/features/auth/presentation/widgets/auth_scaffold.dart';
 
 class LoginPage extends StatefulWidget {
@@ -8,7 +9,7 @@ class LoginPage extends StatefulWidget {
     super.key,
   });
 
-  final VoidCallback onLogin;
+  final void Function(String email, String password) onLogin;
   final VoidCallback onCreateAccount;
 
   @override
@@ -17,8 +18,17 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
+              controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
               decoration: const InputDecoration(
@@ -46,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: _passwordController,
               obscureText: _obscurePassword,
               autofillHints: const [AutofillHints.password],
               decoration: InputDecoration(
@@ -91,6 +103,31 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _submit,
               child: const Text('Sign in'),
             ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.admin_panel_settings_outlined, size: 20),
+                  SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      'Admin demo: ${AppConstants.adminEmail} / ${AppConstants.adminPassword}',
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -109,6 +146,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) widget.onLogin();
+    if (_formKey.currentState!.validate()) {
+      widget.onLogin(
+        _emailController.text.trim().toLowerCase(),
+        _passwordController.text,
+      );
+    }
   }
 }

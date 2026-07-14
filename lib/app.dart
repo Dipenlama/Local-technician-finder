@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/core/theme/app_theme.dart';
+import 'package:mistrix/core/constants/app_constants.dart';
+import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
+import 'package:mistrix/features/admin/presentation/pages/admin_shell.dart';
 import 'package:mistrix/features/auth/presentation/pages/login_page.dart';
 import 'package:mistrix/features/auth/presentation/pages/signup_page.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
@@ -21,6 +24,7 @@ class _MistrixAppState extends State<MistrixApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
   late final TechnicianController _controller;
   late final BookingController _bookingController;
+  late final AdminController _adminController;
 
   @override
   void initState() {
@@ -31,12 +35,15 @@ class _MistrixAppState extends State<MistrixApp> {
       widget.dependencies.createBooking,
       widget.dependencies.getBookings,
     )..load();
+    _adminController = AdminController(widget.dependencies.adminRepository)
+      ..load();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _bookingController.dispose();
+    _adminController.dispose();
     super.dispose();
   }
 
@@ -57,7 +64,7 @@ class _MistrixAppState extends State<MistrixApp> {
     _navigatorKey.currentState!.pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (context) => LoginPage(
-          onLogin: _openHome,
+          onLogin: _handleLogin,
           onCreateAccount: _openSignup,
         ),
       ),
@@ -74,12 +81,36 @@ class _MistrixAppState extends State<MistrixApp> {
   }
 
   void _openHome() {
+    _controller.load();
     _navigatorKey.currentState!.pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (context) => HomeShell(
           technicianController: _controller,
           bookingController: _bookingController,
+          adminController: _adminController,
           getTechnicians: widget.dependencies.getTechnicians,
+          onLogout: _openLogin,
+        ),
+      ),
+      (route) => false,
+    );
+  }
+
+  void _handleLogin(String email, String password) {
+    if (email == AppConstants.adminEmail &&
+        password == AppConstants.adminPassword) {
+      _openAdmin();
+      return;
+    }
+    _openHome();
+  }
+
+  void _openAdmin() {
+    _adminController.load();
+    _navigatorKey.currentState!.pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        builder: (context) => AdminShell(
+          controller: _adminController,
           onLogout: _openLogin,
         ),
       ),

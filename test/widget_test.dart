@@ -37,4 +37,23 @@ void main() {
     expect(find.text('Aarav Sharma'), findsOneWidget);
     expect(find.text('Anita Maharjan'), findsOneWidget);
   });
+
+  testWidgets('admin credentials open the admin dashboard', (tester) async {
+    await tester.pumpWidget(MistrixApp(dependencies: configureDependencies()));
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byType(EditableText).at(0),
+      'admin@mistrix.app',
+    );
+    await tester.enterText(find.byType(EditableText).at(1), 'Admin123');
+    await tester.tap(find.text('Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Admin dashboard'), findsOneWidget);
+    expect(find.text('ADMIN'), findsOneWidget);
+    expect(find.text('Technicians'), findsWidgets);
+    expect(find.text('Clients'), findsWidgets);
+  });
 }

@@ -5,14 +5,31 @@ abstract interface class TechnicianLocalDataSource {
 }
 
 class TechnicianLocalDataSourceImpl implements TechnicianLocalDataSource {
-  const TechnicianLocalDataSourceImpl();
+  TechnicianLocalDataSourceImpl()
+      : _technicians =
+            _seedData.map(TechnicianModel.fromMap).toList(growable: true);
+
+  final List<TechnicianModel> _technicians;
 
   @override
   Future<List<TechnicianModel>> getTechnicians() async {
-    return _technicians.map(TechnicianModel.fromMap).toList(growable: false);
+    return List.unmodifiable(_technicians);
   }
 
-  static const _technicians = <Map<String, Object>>[
+  Future<void> addTechnician(TechnicianModel technician) async {
+    _technicians.add(technician);
+  }
+
+  Future<void> updateTechnician(TechnicianModel technician) async {
+    final index = _technicians.indexWhere((item) => item.id == technician.id);
+    if (index != -1) _technicians[index] = technician;
+  }
+
+  Future<void> deleteTechnician(String id) async {
+    _technicians.removeWhere((item) => item.id == id);
+  }
+
+  static const _seedData = <Map<String, Object>>[
     {
       'id': 'tech-001',
       'name': 'Aarav Sharma',

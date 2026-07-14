@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/core/widgets/mistrix_logo.dart';
+import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
+import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/home/presentation/widgets/service_category.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
@@ -8,6 +10,7 @@ import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 class DashboardTab extends StatelessWidget {
   const DashboardTab({
     required this.controller,
+    required this.adminController,
     required this.onExplore,
     required this.onServiceSelected,
     required this.onBook,
@@ -15,47 +18,10 @@ class DashboardTab extends StatelessWidget {
   });
 
   final TechnicianController controller;
+  final AdminController adminController;
   final VoidCallback onExplore;
   final ValueChanged<ServiceCategoryData> onServiceSelected;
   final ValueChanged<Technician> onBook;
-
-  static const _categories = [
-    ServiceCategoryData(
-      label: 'Electrician',
-      query: 'Electrician',
-      icon: Icons.electrical_services_rounded,
-      color: Color(0xFFFFB547),
-    ),
-    ServiceCategoryData(
-      label: 'Plumber',
-      query: 'Plumber',
-      icon: Icons.plumbing_rounded,
-      color: Color(0xFF4A90E2),
-    ),
-    ServiceCategoryData(
-      label: 'AC Repair',
-      query: 'AC Technician',
-      icon: Icons.ac_unit_rounded,
-      color: Color(0xFF00A8A8),
-    ),
-    ServiceCategoryData(
-      label: 'Computer',
-      query: 'Computer Repair',
-      icon: Icons.computer_rounded,
-      color: Color(0xFF8B5CF6),
-    ),
-    ServiceCategoryData(
-      label: 'Carpenter',
-      query: 'Carpenter',
-      icon: Icons.carpenter_rounded,
-      color: Color(0xFFE46D5C),
-    ),
-    ServiceCategoryData(
-      label: 'More',
-      icon: Icons.grid_view_rounded,
-      color: Color(0xFF637083),
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -164,18 +130,25 @@ class DashboardTab extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
-              sliver: SliverGrid.builder(
-                itemCount: _categories.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.92,
-                ),
-                itemBuilder: (context, index) => ServiceCategory(
-                  data: _categories[index],
-                  onTap: () => onServiceSelected(_categories[index]),
-                ),
+              sliver: ListenableBuilder(
+                listenable: adminController,
+                builder: (context, _) {
+                  final categories = _serviceCategories();
+                  return SliverGrid.builder(
+                    itemCount: categories.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.92,
+                    ),
+                    itemBuilder: (context, index) => ServiceCategory(
+                      data: categories[index],
+                      onTap: () => onServiceSelected(categories[index]),
+                    ),
+                  );
+                },
               ),
             ),
             SliverPadding(
@@ -214,6 +187,49 @@ class DashboardTab extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  List<ServiceCategoryData> _serviceCategories() {
+    final categories = adminController.services
+        .where((service) => service.isActive)
+        .take(5)
+        .map(_categoryFromService)
+        .toList(growable: true);
+    categories.add(
+      const ServiceCategoryData(
+        label: 'More',
+        icon: Icons.grid_view_rounded,
+        color: Color(0xFF637083),
+      ),
+    );
+    return categories;
+  }
+
+  ServiceCategoryData _categoryFromService(AdminService service) {
+    final name = service.name.toLowerCase();
+    final icon = switch (name) {
+      final value when value.contains('electric') =>
+        Icons.electrical_services_rounded,
+      final value when value.contains('plumb') => Icons.plumbing_rounded,
+      final value when value.contains('computer') => Icons.computer_rounded,
+      final value when value.contains('carpenter') => Icons.carpenter_rounded,
+      final value when value.contains('ac') => Icons.ac_unit_rounded,
+      _ => Icons.handyman_rounded,
+    };
+    const colors = [
+      Color(0xFFFFB547),
+      Color(0xFF4A90E2),
+      Color(0xFF00A8A8),
+      Color(0xFF8B5CF6),
+      Color(0xFFE46D5C),
+    ];
+    final index = adminController.services.indexOf(service);
+    return ServiceCategoryData(
+      label: service.name,
+      query: name.contains('ac repair') ? 'AC Technician' : service.name,
+      icon: icon,
+      color: colors[index.abs() % colors.length],
     );
   }
 }

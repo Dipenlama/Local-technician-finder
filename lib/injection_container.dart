@@ -1,3 +1,5 @@
+import 'package:mistrix/features/admin/data/repositories/admin_repository_impl.dart';
+import 'package:mistrix/features/admin/domain/repositories/admin_repository.dart';
 import 'package:mistrix/features/bookings/data/repositories/in_memory_booking_repository.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/create_booking.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/get_bookings.dart';
@@ -10,17 +12,19 @@ class AppDependencies {
     required this.getTechnicians,
     required this.createBooking,
     required this.getBookings,
+    required this.adminRepository,
   });
 
   final GetTechnicians getTechnicians;
   final CreateBooking createBooking;
   final GetBookings getBookings;
+  final AdminRepository adminRepository;
 }
 
 AppDependencies configureDependencies() {
-  const dataSource = TechnicianLocalDataSourceImpl();
-  const repository = TechnicianRepositoryImpl(dataSource);
-  const getTechnicians = GetTechnicians(repository);
+  final dataSource = TechnicianLocalDataSourceImpl();
+  final repository = TechnicianRepositoryImpl(dataSource);
+  final getTechnicians = GetTechnicians(repository);
   final bookingRepository = InMemoryBookingRepository();
   final createBooking = CreateBooking(bookingRepository);
   final getBookings = GetBookings(bookingRepository);
@@ -29,5 +33,6 @@ AppDependencies configureDependencies() {
     getTechnicians: getTechnicians,
     createBooking: createBooking,
     getBookings: getBookings,
+    adminRepository: AdminRepositoryImpl(dataSource),
   );
 }
