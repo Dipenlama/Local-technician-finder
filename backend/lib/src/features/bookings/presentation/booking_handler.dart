@@ -49,7 +49,8 @@ class BookingHandler {
     final scheduledAt = DateTime.tryParse(body['scheduledAt'] as String? ?? '');
 
     final errors = <String, String>{};
-    if (await _technicianRepository.findById(technicianId) == null) {
+    final technician = await _technicianRepository.findById(technicianId);
+    if (technician == null) {
       errors['technicianId'] = 'Technician does not exist.';
     }
     if (service.trim().isEmpty) errors['service'] = 'Service is required.';
@@ -71,6 +72,8 @@ class BookingHandler {
       status: BookingStatus.pending,
       notes: (body['notes'] as String? ?? '').trim(),
       createdAt: DateTime.now().toUtc(),
+      technicianName: technician!.name,
+      location: technician.location,
     );
     await _bookingRepository.create(booking);
     return successResponse(booking.toJson(), statusCode: 201);

@@ -1,0 +1,151 @@
+import 'package:bcrypt/bcrypt.dart';
+import 'package:mistrix_backend/src/core/database/mongo_database.dart';
+import 'package:mistrix_backend/src/core/errors/api_exception.dart';
+import 'package:mistrix_backend/src/core/http/api_response.dart';
+import 'package:mistrix_backend/src/features/auth/domain/services/auth_service.dart';
+import 'package:mistrix_backend/src/features/technicians/data/repositories/mongo_technician_repository.dart';
+import 'package:mistrix_backend/src/features/technicians/domain/entities/technician.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import 'package:shelf/shelf.dart';
+import 'package:shelf_router/shelf_router.dart';
+
+class AdminHandler {
+  const AdminHandler({
+    required this.database,
+    required this.authService,
+    required this.technicians,
+  });
+
+  final MongoDatabase database;
+  final AuthService authService;
+  final MongoTechnicianRepository technicians;
+
+  Router get router {
+    final router = Router();
+    router.get('/services', _getServices);
+    router.put('/services/<id>', _saveService);
+    router.delete('/services/<id>', _deleteService);
+    router.get('/technicians', _getTechnicians);
+    router.put('/technicians/<id>', _saveTechnician);
+    router.delete('/technicians/<id>', _deleteTechnician);
+    router.get('/clients', _getClients);
+    router.put('/clients/<id>', _saveClient);
+    router.delete('/clients/<id>', _deleteClient);
+    return router;
+  }
+
+  Future<void> _requireAdmin(Request request) async {
+    final user = await authService.userFromRequest(request);
+    if (user.role != 'admin') {
+      throw const ApiException(403, 'Admin access required.');
+    }
+  }
+
+  Future<Response> _getServices(Request request) async {
+    await _requireAdmin(request);
+    final items = await database.services.find().toList();
+    return successResponse({'items': items.map(_publicDocument).toList()});
+  }
+
+  Future<Response> _saveService(Request request, String id) async {
+    await _requireAdmin(request);
+    final body = await readJsonObject(request);
+    await database.services.replaceOne(where.eq('_id', id), {
+      '_id': id,
+      'name': body['name'],
+      'description': body['description'],
+      'basePrice': body['basePrice'],
+      'isActive': body['isActive'] ?? true,
+    }, upsert: true);
+    return successResponse({'id': id});
+  }
+
+  Future<Response> _deleteService(Request request, String id) async {
+    await _requireAdmin(request);
+    await database.services.deleteOne(where.eq('_id', id));
+    return successResponse({'id': id});
+  }
+
+  Future<Response> _getTechnicians(Request request) async {
+    await _requireAdmin(request);
+    final items = await technicians.findAll();
+    return successResponse({
+      'items': items.map((item) => item.toJson()).toList(),
+    });
+  }
+
+  Future<Response> _saveTechnician(Request request, String id) async {
+    await _requireAdmin(request);
+    final body = await readJsonObject(request);
+    await technicians.save(
+      Technician(
+        id: id,
+        name: body['name'] as String,
+        profession: body['profession'] as String,
+        location: body['location'] as String,
+        rating: (body['rating'] as num).toDouble(),
+        reviewCount: body['reviewCount'] as int? ?? 0,
+        isAvailable: body['isAvailable'] as bool? ?? true,
+        hourlyRate: (body['hourlyRate'] as num?)?.toDouble() ?? 0,
+      ),
+    );
+    return successResponse({'id': id});
+  }
+
+  Future<Response> _deleteTechnician(Request request, String id) async {
+    await _requireAdmin(request);
+    await technicians.delete(id);
+    return successResponse({'id': id});
+  }
+
+  Future<Response> _getClients(Request request) async {
+    await _requireAdmin(request);
+    final documents =
+        await database.users.find(where.eq('role', 'client')).toList();
+    final items =
+        documents
+            .map(
+              (item) => {
+                'id': item['_id'],
+                'name': item['name'],
+                'email': item['email'],
+                'phone': item['phone'],
+                'isActive': item['isActive'] ?? true,
+                'joinedAt':
+                    (item['createdAt'] as DateTime).toUtc().toIso8601String(),
+              },
+            )
+            .toList();
+    return successResponse({'items': items});
+  }
+
+  Future<Response> _saveClient(Request request, String id) async {
+    await _requireAdmin(request);
+    final body = await readJsonObject(request);
+    final existing = await database.users.findOne(where.eq('_id', id));
+    await database.users.replaceOne(where.eq('_id', id), {
+      '_id': id,
+      'name': body['name'],
+      'email': (body['email'] as String).toLowerCase(),
+      'phone': body['phone'],
+      'isActive': body['isActive'] ?? true,
+      'role': 'client',
+      'createdAt': existing?['createdAt'] ?? DateTime.now().toUtc(),
+      'passwordHash':
+          existing?['passwordHash'] ??
+          BCrypt.hashpw('ChangeMe123', BCrypt.gensalt()),
+    }, upsert: true);
+    return successResponse({'id': id});
+  }
+
+  Future<Response> _deleteClient(Request request, String id) async {
+    await _requireAdmin(request);
+    await database.users.deleteOne(where.eq('_id', id));
+    return successResponse({'id': id});
+  }
+
+  Map<String, dynamic> _publicDocument(Map<String, dynamic> item) => {
+    'id': item['_id'],
+    ...item..remove('_id'),
+  };
+}

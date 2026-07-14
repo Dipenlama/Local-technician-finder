@@ -6,6 +6,7 @@ class User {
     required this.phone,
     required this.passwordHash,
     required this.createdAt,
+    this.role = 'client',
   });
 
   final String id;
@@ -14,6 +15,7 @@ class User {
   final String phone;
   final String passwordHash;
   final DateTime createdAt;
+  final String role;
 
   Map<String, Object> toPublicJson() => {
     'id': id,
@@ -21,5 +23,6 @@ class User {
     'email': email,
     'phone': phone,
     'createdAt': createdAt.toUtc().toIso8601String(),
+    'role': role,
   };
 }

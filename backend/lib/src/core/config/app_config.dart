@@ -6,6 +6,7 @@ class AppConfig {
     required this.port,
     required this.jwtSecret,
     required this.allowedOrigin,
+    this.mongodbUri = 'mongodb://localhost:27017/mistrix',
   });
 
   factory AppConfig.fromEnvironment() {
@@ -16,6 +17,8 @@ class AppConfig {
       jwtSecret:
           environment['JWT_SECRET'] ?? 'mistrix-development-secret-change-me',
       allowedOrigin: environment['ALLOWED_ORIGIN'] ?? '*',
+      mongodbUri:
+          environment['MONGODB_URI'] ?? 'mongodb://localhost:27017/mistrix',
     );
   }
 
@@ -23,4 +26,5 @@ class AppConfig {
   final int port;
   final String jwtSecret;
   final String allowedOrigin;
+  final String mongodbUri;
 }

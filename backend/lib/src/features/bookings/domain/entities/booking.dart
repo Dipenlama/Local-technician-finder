@@ -11,6 +11,8 @@ class Booking {
     required this.status,
     required this.notes,
     required this.createdAt,
+    this.technicianName = '',
+    this.location = '',
   });
 
   final String id;
@@ -22,6 +24,8 @@ class Booking {
   final BookingStatus status;
   final String notes;
   final DateTime createdAt;
+  final String technicianName;
+  final String location;
 
   Map<String, Object> toJson() => {
     'id': id,
@@ -33,5 +37,7 @@ class Booking {
     'status': status.name,
     'notes': notes,
     'createdAt': createdAt.toUtc().toIso8601String(),
+    'technicianName': technicianName,
+    'location': location,
   };
 }
