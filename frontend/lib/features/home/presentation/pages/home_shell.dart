@@ -86,8 +86,7 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(index: _selectedIndex, children: pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _selectedIndex = index),
+        onDestinationSelected: _selectDestination,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -112,6 +111,13 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
     );
+  }
+
+  void _selectDestination(int index) {
+    setState(() => _selectedIndex = index);
+    if (index == 2) {
+      widget.bookingController.load();
+    }
   }
 
   void _openService(ServiceCategoryData service) {

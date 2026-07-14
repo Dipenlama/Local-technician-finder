@@ -32,15 +32,18 @@ Set `MONGODB_URI` to use a different local database or MongoDB Atlas cluster.
 | POST | `/api/v1/auth/signup` | No |
 | POST | `/api/v1/auth/login` | No |
 | GET | `/api/v1/auth/me` | Bearer token |
+| PUT | `/api/v1/auth/me` | Bearer token |
 | GET | `/api/v1/technicians` | No |
 | GET | `/api/v1/technicians/<id>` | No |
 | GET | `/api/v1/bookings` | Bearer token |
 | POST | `/api/v1/bookings` | Bearer token |
+| GET | `/api/v1/admin/bookings` | Admin bearer token |
+| PUT | `/api/v1/admin/bookings/<id>` | Admin bearer token |
 
 Technicians accept optional `query`, `profession`, and `available` query parameters.
 
 ## Architecture
 
 Each feature separates domain entities/contracts, data implementations, and HTTP
-presentation handlers. In-memory repositories are used for development; replace
-them with database-backed implementations without changing routes or services.
+presentation handlers. The server entry point uses MongoDB-backed repositories;
+in-memory implementations remain available for isolated tests.

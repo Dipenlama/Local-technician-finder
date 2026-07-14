@@ -113,8 +113,12 @@ class _BookingCard extends StatelessWidget {
     final displayName = booking.technicianName.trim().isEmpty
         ? 'Technician'
         : booking.technicianName;
-    final isPending = booking.status == BookingStatus.pending;
-    final statusColor = isPending ? Colors.orange : Colors.green;
+    final statusColor = switch (booking.status) {
+      BookingStatus.pending => Colors.orange,
+      BookingStatus.confirmed => Colors.green,
+      BookingStatus.completed => Colors.blue,
+      BookingStatus.cancelled => Colors.red,
+    };
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -155,9 +159,7 @@ class _BookingCard extends StatelessWidget {
                   child: Text(
                     booking.status.name,
                     style: TextStyle(
-                      color: isPending
-                          ? Colors.orange.shade800
-                          : Colors.green.shade700,
+                      color: statusColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),

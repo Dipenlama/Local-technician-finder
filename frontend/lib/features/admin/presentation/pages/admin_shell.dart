@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/admin/presentation/pages/tabs/admin_clients_tab.dart';
+import 'package:mistrix/features/admin/presentation/pages/tabs/admin_bookings_tab.dart';
 import 'package:mistrix/features/admin/presentation/pages/tabs/admin_dashboard_tab.dart';
 import 'package:mistrix/features/admin/presentation/pages/tabs/admin_services_tab.dart';
 import 'package:mistrix/features/admin/presentation/pages/tabs/admin_technicians_tab.dart';
@@ -30,6 +31,7 @@ class _AdminShellState extends State<AdminShell> {
         onOpenSection: (index) => setState(() => _selectedIndex = index),
         onLogout: widget.onLogout,
       ),
+      AdminBookingsTab(controller: widget.controller),
       AdminServicesTab(controller: widget.controller),
       AdminTechniciansTab(controller: widget.controller),
       AdminClientsTab(controller: widget.controller),
@@ -48,6 +50,11 @@ class _AdminShellState extends State<AdminShell> {
             label: 'Dashboard',
           ),
           NavigationDestination(
+            icon: Icon(Icons.event_note_outlined),
+            selectedIcon: Icon(Icons.event_note_rounded),
+            label: 'Bookings',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.home_repair_service_outlined),
             selectedIcon: Icon(Icons.home_repair_service_rounded),
             label: 'Services',
@@ -55,7 +62,7 @@ class _AdminShellState extends State<AdminShell> {
           NavigationDestination(
             icon: Icon(Icons.engineering_outlined),
             selectedIcon: Icon(Icons.engineering_rounded),
-            label: 'Technicians',
+            label: 'Techs',
           ),
           NavigationDestination(
             icon: Icon(Icons.people_outline_rounded),

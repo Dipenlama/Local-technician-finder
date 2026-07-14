@@ -1,6 +1,7 @@
 import 'package:mistrix/core/network/api_client.dart';
 import 'package:mistrix/core/errors/app_exception.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_client.dart';
+import 'package:mistrix/features/admin/domain/entities/admin_booking.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/admin/domain/repositories/admin_repository.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
@@ -106,4 +107,36 @@ class RemoteAdminRepository implements AdminRepository {
 
   @override
   Future<void> deleteClient(String id) => _client.delete('/admin/clients/$id');
+
+  @override
+  Future<List<AdminBooking>> getBookings() async {
+    final data = await _client.get('/admin/bookings') as Map<String, dynamic>;
+    return (data['items'] as List)
+        .cast<Map<String, dynamic>>()
+        .map(_bookingFromJson)
+        .toList(growable: false);
+  }
+
+  @override
+  Future<AdminBooking> updateBooking(AdminBooking booking) async {
+    final data = await _client.put('/admin/bookings/${booking.id}', {
+      'status': booking.status,
+      'scheduledAt': booking.scheduledAt.toUtc().toIso8601String(),
+    }) as Map<String, dynamic>;
+    return _bookingFromJson(data);
+  }
+
+  AdminBooking _bookingFromJson(Map<String, dynamic> item) => AdminBooking(
+        id: item['id'] as String,
+        customerId: item['customerId'] as String,
+        customerName: item['customerName'] as String? ?? 'Client',
+        customerEmail: item['customerEmail'] as String? ?? '',
+        technicianId: item['technicianId'] as String,
+        technicianName: item['technicianName'] as String? ?? 'Technician',
+        service: item['service'] as String,
+        address: item['address'] as String,
+        scheduledAt: DateTime.parse(item['scheduledAt'] as String).toLocal(),
+        status: item['status'] as String,
+        createdAt: DateTime.parse(item['createdAt'] as String).toLocal(),
+      );
 }

@@ -1,4 +1,5 @@
 import 'package:mistrix/features/admin/domain/entities/admin_client.dart';
+import 'package:mistrix/features/admin/domain/entities/admin_booking.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/admin/domain/repositories/admin_repository.dart';
 import 'package:mistrix/features/technicians/data/data_sources/technician_local_data_source.dart';
@@ -13,6 +14,7 @@ class AdminRepositoryImpl implements AdminRepository {
   final TechnicianLocalDataSourceImpl _technicianDataSource;
   final List<AdminService> _services;
   final List<AdminClient> _clients;
+  final List<AdminBooking> _bookings = [];
 
   static const _seedServices = [
     AdminService(
@@ -141,5 +143,20 @@ class AdminRepositoryImpl implements AdminRepository {
   @override
   Future<void> deleteClient(String id) async {
     _clients.removeWhere((item) => item.id == id);
+  }
+
+  @override
+  Future<List<AdminBooking>> getBookings() async =>
+      List.unmodifiable(_bookings);
+
+  @override
+  Future<AdminBooking> updateBooking(AdminBooking booking) async {
+    final index = _bookings.indexWhere((item) => item.id == booking.id);
+    if (index == -1) {
+      _bookings.add(booking);
+    } else {
+      _bookings[index] = booking;
+    }
+    return booking;
   }
 }

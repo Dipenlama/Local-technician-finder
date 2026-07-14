@@ -31,6 +31,8 @@ class AdminHandler {
     router.get('/clients', _getClients);
     router.put('/clients/<id>', _saveClient);
     router.delete('/clients/<id>', _deleteClient);
+    router.get('/bookings', _getBookings);
+    router.put('/bookings/<id>', _updateBooking);
     return router;
   }
 
@@ -142,6 +144,70 @@ class AdminHandler {
     await _requireAdmin(request);
     await database.users.deleteOne(where.eq('_id', id));
     return successResponse({'id': id});
+  }
+
+  Future<Response> _getBookings(Request request) async {
+    await _requireAdmin(request);
+    final documents = await database.bookings.find().toList();
+    documents.sort((a, b) {
+      final aDate = a['createdAt'] as DateTime;
+      final bDate = b['createdAt'] as DateTime;
+      return bDate.compareTo(aDate);
+    });
+    final items = await Future.wait(documents.map(_bookingResponse));
+    return successResponse({'items': items, 'count': items.length});
+  }
+
+  Future<Response> _updateBooking(Request request, String id) async {
+    await _requireAdmin(request);
+    final existing = await database.bookings.findOne(where.eq('_id', id));
+    if (existing == null) {
+      throw const ApiException(404, 'Booking not found.');
+    }
+    final body = await readJsonObject(request);
+    final status = body['status'] as String? ?? existing['status'] as String;
+    const allowedStatuses = {'pending', 'confirmed', 'cancelled', 'completed'};
+    if (!allowedStatuses.contains(status)) {
+      throw const ApiException(422, 'Invalid booking status.');
+    }
+    final scheduledAtValue = body['scheduledAt'] as String?;
+    final scheduledAt =
+        scheduledAtValue == null
+            ? existing['scheduledAt'] as DateTime
+            : DateTime.tryParse(scheduledAtValue);
+    if (scheduledAt == null) {
+      throw const ApiException(422, 'Invalid booking date and time.');
+    }
+
+    final updated =
+        Map<String, dynamic>.from(existing)
+          ..['status'] = status
+          ..['scheduledAt'] = scheduledAt.toUtc()
+          ..['updatedAt'] = DateTime.now().toUtc();
+    await database.bookings.replaceOne(where.eq('_id', id), updated);
+    return successResponse(await _bookingResponse(updated));
+  }
+
+  Future<Map<String, dynamic>> _bookingResponse(
+    Map<String, dynamic> booking,
+  ) async {
+    final customer = await database.users.findOne(
+      where.eq('_id', booking['customerId']),
+    );
+    return {
+      'id': booking['_id'],
+      'customerId': booking['customerId'],
+      'customerName': customer?['name'] ?? 'Client',
+      'customerEmail': customer?['email'] ?? '',
+      'technicianId': booking['technicianId'],
+      'technicianName': booking['technicianName'] ?? 'Technician',
+      'service': booking['service'],
+      'address': booking['address'],
+      'scheduledAt':
+          (booking['scheduledAt'] as DateTime).toUtc().toIso8601String(),
+      'status': booking['status'],
+      'createdAt': (booking['createdAt'] as DateTime).toUtc().toIso8601String(),
+    };
   }
 
   Map<String, dynamic> _publicDocument(Map<String, dynamic> item) => {

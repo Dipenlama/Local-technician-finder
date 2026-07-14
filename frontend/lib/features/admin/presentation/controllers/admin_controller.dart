@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_client.dart';
+import 'package:mistrix/features/admin/domain/entities/admin_booking.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/admin/domain/repositories/admin_repository.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
@@ -14,6 +15,7 @@ class AdminController extends ChangeNotifier {
   List<AdminService> services = const [];
   List<Technician> technicians = const [];
   List<AdminClient> clients = const [];
+  List<AdminBooking> bookings = const [];
 
   Future<void> load() async {
     isLoading = true;
@@ -23,6 +25,7 @@ class AdminController extends ChangeNotifier {
       services = await _repository.getServices();
       technicians = await _repository.getTechnicians();
       clients = await _repository.getClients();
+      bookings = await _repository.getBookings();
     } on Exception catch (error) {
       errorMessage = error.toString();
     } finally {
@@ -74,6 +77,12 @@ class AdminController extends ChangeNotifier {
   Future<void> deleteClient(String id) async {
     await _repository.deleteClient(id);
     clients = await _repository.getClients();
+    notifyListeners();
+  }
+
+  Future<void> updateBooking(AdminBooking booking) async {
+    await _repository.updateBooking(booking);
+    bookings = await _repository.getBookings();
     notifyListeners();
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mistrix/features/bookings/data/repositories/in_memory_booking_repository.dart';
+import 'package:mistrix/features/bookings/domain/entities/booking.dart';
+import 'package:mistrix/features/bookings/domain/repositories/booking_repository.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/create_booking.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/get_bookings.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
@@ -42,4 +44,62 @@ void main() {
     expect(find.text('Thamel, Kathmandu'), findsOneWidget);
     expect(find.text('confirmed'), findsOneWidget);
   });
+
+  testWidgets('completed and cancelled bookings appear in matching tabs', (
+    tester,
+  ) async {
+    final repository = _StatusBookingRepository([
+      _booking(
+          'completed-booking', 'Completed Technician', BookingStatus.completed),
+      _booking(
+          'cancelled-booking', 'Cancelled Technician', BookingStatus.cancelled),
+    ]);
+    final controller = BookingController(
+      CreateBooking(repository),
+      GetBookings(repository),
+    );
+    addTearDown(controller.dispose);
+    await controller.load();
+
+    await tester.pumpWidget(
+      MaterialApp(home: Scaffold(body: BookingsTab(controller: controller))),
+    );
+
+    await tester.tap(find.text('Completed'));
+    await tester.pumpAndSettle();
+    expect(find.text('Completed Technician'), findsOneWidget);
+    expect(find.text('Cancelled Technician'), findsNothing);
+
+    await tester.tap(find.text('Cancelled'));
+    await tester.pumpAndSettle();
+    expect(find.text('Cancelled Technician'), findsOneWidget);
+    expect(find.text('Completed Technician'), findsNothing);
+  });
+}
+
+Booking _booking(String id, String technicianName, BookingStatus status) {
+  return Booking(
+    id: id,
+    technicianId: 'tech-$id',
+    technicianName: technicianName,
+    service: 'Electrician',
+    location: 'Kathmandu',
+    address: 'Kathmandu',
+    scheduledAt: DateTime(2026, 7, 20),
+    notes: '',
+    status: status,
+    createdAt: DateTime(2026, 7, 14),
+  );
+}
+
+class _StatusBookingRepository implements BookingRepository {
+  _StatusBookingRepository(this.bookings);
+
+  final List<Booking> bookings;
+
+  @override
+  Future<Booking> createBooking(Booking booking) async => booking;
+
+  @override
+  Future<List<Booking>> getBookings() async => List.unmodifiable(bookings);
 }
