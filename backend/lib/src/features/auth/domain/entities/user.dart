@@ -25,4 +25,16 @@ class User {
     'createdAt': createdAt.toUtc().toIso8601String(),
     'role': role,
   };
+
+  User copyWith({String? name, String? email, String? phone}) {
+    return User(
+      id: id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      passwordHash: passwordHash,
+      createdAt: createdAt,
+      role: role,
+    );
+  }
 }

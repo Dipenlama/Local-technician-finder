@@ -85,6 +85,42 @@ class AuthService {
     }
   }
 
+  Future<User> updateProfile(
+    Request request, {
+    required String name,
+    required String email,
+    required String phone,
+  }) async {
+    final user = await userFromRequest(request);
+    final normalizedEmail = email.trim().toLowerCase();
+    final errors = <String, String>{};
+    if (name.trim().length < 3) {
+      errors['name'] = 'Name must contain at least 3 characters.';
+    }
+    if (!normalizedEmail.contains('@')) {
+      errors['email'] = 'Enter a valid email address.';
+    }
+    if (phone.trim().length < 8) {
+      errors['phone'] = 'Enter a valid phone number.';
+    }
+    if (errors.isNotEmpty) {
+      throw ApiException(422, 'Validation failed.', details: errors);
+    }
+
+    final emailOwner = await _userRepository.findByEmail(normalizedEmail);
+    if (emailOwner != null && emailOwner.id != user.id) {
+      throw const ApiException(409, 'This email is already in use.');
+    }
+
+    return _userRepository.update(
+      user.copyWith(
+        name: name.trim(),
+        email: normalizedEmail,
+        phone: phone.trim(),
+      ),
+    );
+  }
+
   String _createToken(User user) {
     final jwt = JWT(
       {'email': user.email, 'name': user.name},

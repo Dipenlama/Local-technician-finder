@@ -107,6 +107,8 @@ class _MistrixAppState extends State<MistrixApp> {
           getTechnicians: widget.dependencies.getTechnicians,
           userName: user.name,
           userEmail: user.email,
+          userPhone: user.phone,
+          authApiService: widget.dependencies.authApiService,
           onLogout: _openLogin,
         ),
       ),

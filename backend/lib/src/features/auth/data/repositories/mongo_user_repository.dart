@@ -28,6 +28,15 @@ class MongoUserRepository implements UserRepository {
     return document == null ? null : _fromDocument(document);
   }
 
+  @override
+  Future<User> update(User user) async {
+    await _database.users.replaceOne(
+      where.eq('_id', user.id),
+      _toDocument(user),
+    );
+    return user;
+  }
+
   User _fromDocument(Map<String, dynamic> document) {
     return User(
       id: document['_id'] as String,

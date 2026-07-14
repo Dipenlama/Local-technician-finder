@@ -49,6 +49,30 @@ void main() {
 
     expect(find.text('User'), findsOneWidget);
     expect(find.text('user@mistrix.app'), findsOneWidget);
+
+    await tester.tap(find.text('Personal information'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(EditableText).at(0), 'User Full Name');
+    await tester.enterText(
+      find.byType(EditableText).at(1),
+      'updated@mistrix.app',
+    );
+    await tester.enterText(find.byType(EditableText).at(2), '9800000000');
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('User Full Name'), findsOneWidget);
+    expect(find.text('updated@mistrix.app'), findsOneWidget);
+
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 800),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Good morning, User Full Name 👋'), findsOneWidget);
   });
 
   testWidgets('admin credentials open the admin dashboard', (tester) async {

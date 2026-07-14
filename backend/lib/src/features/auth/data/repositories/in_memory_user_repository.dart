@@ -21,4 +21,10 @@ class InMemoryUserRepository implements UserRepository {
 
   @override
   Future<User?> findById(String id) async => _users[id];
+
+  @override
+  Future<User> update(User user) async {
+    _users[user.id] = user;
+    return user;
+  }
 }

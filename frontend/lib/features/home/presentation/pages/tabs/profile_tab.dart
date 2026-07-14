@@ -4,12 +4,16 @@ class ProfileTab extends StatelessWidget {
   const ProfileTab({
     required this.userName,
     required this.userEmail,
+    required this.userPhone,
+    required this.onEditPersonalInformation,
     required this.onLogout,
     super.key,
   });
 
   final String userName;
   final String userEmail;
+  final String userPhone;
+  final VoidCallback onEditPersonalInformation;
   final VoidCallback onLogout;
 
   @override
@@ -57,7 +61,9 @@ class ProfileTab extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.edit_outlined)),
+                    onPressed: onEditPersonalInformation,
+                    icon: const Icon(Icons.edit_outlined),
+                  ),
                 ],
               ),
             ),
@@ -69,7 +75,7 @@ class ProfileTab extends StatelessWidget {
                 _ProfileTile(
                     icon: Icons.person_outline,
                     title: 'Personal information',
-                    onTap: () {}),
+                    onTap: onEditPersonalInformation),
                 const Divider(height: 1, indent: 58),
                 _ProfileTile(
                     icon: Icons.location_on_outlined,

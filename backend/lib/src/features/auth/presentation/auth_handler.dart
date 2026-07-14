@@ -13,6 +13,7 @@ class AuthHandler {
     router.post('/signup', _signup);
     router.post('/login', _login);
     router.get('/me', _me);
+    router.put('/me', _updateMe);
     return router;
   }
 
@@ -38,6 +39,17 @@ class AuthHandler {
 
   Future<Response> _me(Request request) async {
     final user = await _authService.userFromRequest(request);
+    return successResponse(user.toPublicJson());
+  }
+
+  Future<Response> _updateMe(Request request) async {
+    final body = await readJsonObject(request);
+    final user = await _authService.updateProfile(
+      request,
+      name: body['name'] as String? ?? '',
+      email: body['email'] as String? ?? '',
+      phone: body['phone'] as String? ?? '',
+    );
     return successResponse(user.toPublicJson());
   }
 }

@@ -32,6 +32,25 @@ class AuthApiService {
     return _saveSession(data);
   }
 
+  Future<AuthSession> updateProfile({
+    required String name,
+    required String email,
+    required String phone,
+  }) async {
+    final user = await _client.put('/auth/me', {
+      'name': name,
+      'email': email,
+      'phone': phone,
+    }) as Map<String, dynamic>;
+    return AuthSession(
+      id: user['id'] as String,
+      name: user['name'] as String,
+      email: user['email'] as String,
+      phone: user['phone'] as String? ?? '',
+      role: user['role'] as String? ?? 'client',
+    );
+  }
+
   AuthSession _saveSession(Map<String, dynamic> data) {
     _client.token = data['token'] as String;
     final user = data['user'] as Map<String, dynamic>;
@@ -39,6 +58,7 @@ class AuthApiService {
       id: user['id'] as String,
       name: user['name'] as String,
       email: user['email'] as String,
+      phone: user['phone'] as String? ?? '',
       role: user['role'] as String? ?? 'client',
     );
   }
@@ -50,10 +70,12 @@ class AuthSession {
     required this.name,
     required this.email,
     required this.role,
+    this.phone = '',
   });
 
   final String id;
   final String name;
   final String email;
   final String role;
+  final String phone;
 }
