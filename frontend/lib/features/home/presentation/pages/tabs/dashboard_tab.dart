@@ -11,6 +11,7 @@ class DashboardTab extends StatelessWidget {
   const DashboardTab({
     required this.controller,
     required this.adminController,
+    required this.userName,
     required this.onExplore,
     required this.onServiceSelected,
     required this.onBook,
@@ -19,6 +20,7 @@ class DashboardTab extends StatelessWidget {
 
   final TechnicianController controller;
   final AdminController adminController;
+  final String userName;
   final VoidCallback onExplore;
   final ValueChanged<ServiceCategoryData> onServiceSelected;
   final ValueChanged<Technician> onBook;
@@ -49,7 +51,7 @@ class DashboardTab extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 26),
-                  Text('Good morning, Dipen 👋',
+                  Text('Good morning, $userName 👋',
                       style: Theme.of(context).textTheme.bodyLarge),
                   const SizedBox(height: 4),
                   Text(

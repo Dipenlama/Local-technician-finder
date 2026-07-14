@@ -6,6 +6,7 @@ import 'package:mistrix/features/admin/presentation/controllers/admin_controller
 import 'package:mistrix/features/admin/presentation/pages/admin_shell.dart';
 import 'package:mistrix/features/auth/presentation/pages/login_page.dart';
 import 'package:mistrix/features/auth/presentation/pages/signup_page.dart';
+import 'package:mistrix/features/auth/data/auth_api_service.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/home/presentation/pages/home_shell.dart';
 import 'package:mistrix/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -26,6 +27,7 @@ class _MistrixAppState extends State<MistrixApp> {
   late final TechnicianController _controller;
   late final BookingController _bookingController;
   late final AdminController _adminController;
+  AuthSession? _currentUser;
 
   @override
   void initState() {
@@ -64,6 +66,8 @@ class _MistrixAppState extends State<MistrixApp> {
   }
 
   void _openLogin() {
+    _currentUser = null;
+    widget.dependencies.authApiService?.logout();
     _navigatorKey.currentState!.pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (context) => LoginPage(
@@ -84,6 +88,13 @@ class _MistrixAppState extends State<MistrixApp> {
   }
 
   void _openHome() {
+    final user = _currentUser ??
+        const AuthSession(
+          id: 'local-client',
+          name: 'Mistrix User',
+          email: 'user@mistrix.app',
+          role: 'client',
+        );
     _controller.load();
     _bookingController.load();
     _adminController.loadServices();
@@ -94,6 +105,8 @@ class _MistrixAppState extends State<MistrixApp> {
           bookingController: _bookingController,
           adminController: _adminController,
           getTechnicians: widget.dependencies.getTechnicians,
+          userName: user.name,
+          userEmail: user.email,
           onLogout: _openLogin,
         ),
       ),
@@ -109,11 +122,18 @@ class _MistrixAppState extends State<MistrixApp> {
             password == AppConstants.adminPassword) {
           _openAdmin();
         } else {
+          _currentUser = AuthSession(
+            id: 'local-client',
+            name: _nameFromEmail(email),
+            email: email,
+            role: 'client',
+          );
           _openHome();
         }
         return null;
       }
       final session = await authApi.login(email, password);
+      _currentUser = session;
       if (session.role == 'admin') {
         _openAdmin();
       } else {
@@ -134,11 +154,18 @@ class _MistrixAppState extends State<MistrixApp> {
     try {
       final authApi = widget.dependencies.authApiService;
       if (authApi != null) {
-        await authApi.signup(
+        _currentUser = await authApi.signup(
           name: name,
           email: email,
           phone: phone,
           password: password,
+        );
+      } else {
+        _currentUser = AuthSession(
+          id: 'local-client',
+          name: name,
+          email: email,
+          role: 'client',
         );
       }
       _openHome();
@@ -159,5 +186,14 @@ class _MistrixAppState extends State<MistrixApp> {
       ),
       (route) => false,
     );
+  }
+
+  String _nameFromEmail(String email) {
+    final value = email.split('@').first.replaceAll(RegExp(r'[._-]+'), ' ');
+    return value
+        .split(' ')
+        .where((part) => part.isNotEmpty)
+        .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
+        .join(' ');
   }
 }

@@ -28,6 +28,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('What service do you need?'), findsOneWidget);
+    expect(find.text('Good morning, User 👋'), findsOneWidget);
     expect(find.text('Explore'), findsOneWidget);
     expect(find.text('Bookings'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
@@ -40,6 +41,14 @@ void main() {
     expect(find.text('Electrician technicians'), findsOneWidget);
     expect(find.text('Aarav Sharma'), findsOneWidget);
     expect(find.text('Anita Maharjan'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('User'), findsOneWidget);
+    expect(find.text('user@mistrix.app'), findsOneWidget);
   });
 
   testWidgets('admin credentials open the admin dashboard', (tester) async {

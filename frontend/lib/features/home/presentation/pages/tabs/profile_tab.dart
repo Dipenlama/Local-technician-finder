@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ProfileTab extends StatelessWidget {
-  const ProfileTab({required this.onLogout, super.key});
+  const ProfileTab({
+    required this.userName,
+    required this.userEmail,
+    required this.onLogout,
+    super.key,
+  });
 
+  final String userName;
+  final String userEmail;
   final VoidCallback onLogout;
 
   @override
@@ -27,7 +34,7 @@ class ProfileTab extends StatelessWidget {
                     backgroundColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     child: Text(
-                      'D',
+                      _initials(userName),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 27,
@@ -36,16 +43,16 @@ class ProfileTab extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Dipen',
-                            style: TextStyle(
+                        Text(userName,
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w800)),
-                        SizedBox(height: 3),
-                        Text('dipen@example.com',
-                            style: TextStyle(color: Colors.blueGrey)),
+                        const SizedBox(height: 3),
+                        Text(userEmail,
+                            style: const TextStyle(color: Colors.blueGrey)),
                       ],
                     ),
                   ),
@@ -113,6 +120,13 @@ class ProfileTab extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return 'U';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 }
 

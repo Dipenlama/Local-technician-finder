@@ -5,6 +5,10 @@ class AuthApiService {
 
   final ApiClient _client;
 
+  void logout() {
+    _client.token = null;
+  }
+
   Future<AuthSession> login(String email, String password) async {
     final data = await _client.post('/auth/login', {
       'email': email,

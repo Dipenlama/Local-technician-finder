@@ -18,6 +18,8 @@ class HomeShell extends StatefulWidget {
     required this.bookingController,
     required this.adminController,
     required this.getTechnicians,
+    required this.userName,
+    required this.userEmail,
     required this.onLogout,
     super.key,
   });
@@ -26,6 +28,8 @@ class HomeShell extends StatefulWidget {
   final BookingController bookingController;
   final AdminController adminController;
   final GetTechnicians getTechnicians;
+  final String userName;
+  final String userEmail;
   final VoidCallback onLogout;
 
   @override
@@ -41,6 +45,7 @@ class _HomeShellState extends State<HomeShell> {
       DashboardTab(
         controller: widget.technicianController,
         adminController: widget.adminController,
+        userName: widget.userName,
         onExplore: () => setState(() => _selectedIndex = 1),
         onServiceSelected: _openService,
         onBook: _openBooking,
@@ -51,7 +56,11 @@ class _HomeShellState extends State<HomeShell> {
         onBook: _openBooking,
       ),
       BookingsTab(controller: widget.bookingController),
-      ProfileTab(onLogout: widget.onLogout),
+      ProfileTab(
+        userName: widget.userName,
+        userEmail: widget.userEmail,
+        onLogout: widget.onLogout,
+      ),
     ];
 
     return Scaffold(
