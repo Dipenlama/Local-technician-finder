@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/bookings/domain/entities/booking.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
+import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 class BookingsTab extends StatefulWidget {
   const BookingsTab({required this.controller, super.key});
@@ -127,11 +128,9 @@ class _BookingCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  child: Text(
-                    displayName.substring(0, 1),
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
+                TechnicianAvatar(
+                  name: displayName,
+                  imageUrl: booking.technicianImageUrl,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

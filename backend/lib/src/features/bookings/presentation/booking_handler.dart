@@ -34,10 +34,19 @@ class BookingHandler {
   Future<Response> _findMine(Request request) async {
     final user = await _authService.userFromRequest(request);
     final bookings = await _bookingRepository.findByCustomerId(user.id);
-    return successResponse({
-      'items': bookings.map((item) => item.toJson()).toList(growable: false),
-      'count': bookings.length,
-    });
+    final items = await Future.wait(
+      bookings.map((booking) async {
+        final technician = await _technicianRepository.findById(
+          booking.technicianId,
+        );
+        return {
+          ...booking.toJson(),
+          'technicianImageUrl':
+              technician?.imageUrl ?? booking.technicianImageUrl,
+        };
+      }),
+    );
+    return successResponse({'items': items, 'count': bookings.length});
   }
 
   Future<Response> _create(Request request) async {
@@ -74,6 +83,7 @@ class BookingHandler {
       createdAt: DateTime.now().toUtc(),
       technicianName: technician!.name,
       location: technician.location,
+      technicianImageUrl: technician.imageUrl,
     );
     await _bookingRepository.create(booking);
     return successResponse(booking.toJson(), statusCode: 201);

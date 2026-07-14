@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_client.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
+import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 Future<bool> confirmAdminDelete(BuildContext context, String name) async {
   return await showDialog<bool>(
@@ -184,6 +188,8 @@ class _TechnicianEditorState extends State<_TechnicianEditor> {
   late final TextEditingController _location;
   late final TextEditingController _rating;
   late bool _available;
+  late String _imageUrl;
+  bool _isPickingImage = false;
 
   @override
   void initState() {
@@ -195,6 +201,7 @@ class _TechnicianEditorState extends State<_TechnicianEditor> {
     _rating = TextEditingController(
         text: widget.technician?.rating.toString() ?? '5.0');
     _available = widget.technician?.isAvailable ?? true;
+    _imageUrl = widget.technician?.imageUrl ?? '';
   }
 
   @override
@@ -217,10 +224,42 @@ class _TechnicianEditorState extends State<_TechnicianEditor> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              TechnicianAvatar(
+                name: _name.text,
+                imageUrl: _imageUrl,
+                radius: 42,
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children: [
+                  TextButton.icon(
+                    onPressed: _isPickingImage ? null : _pickImage,
+                    icon: _isPickingImage
+                        ? const SizedBox.square(
+                            dimension: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.add_photo_alternate_outlined),
+                    label: Text(
+                      _imageUrl.isEmpty ? 'Choose image' : 'Change image',
+                    ),
+                  ),
+                  if (_imageUrl.isNotEmpty)
+                    TextButton.icon(
+                      onPressed: () => setState(() => _imageUrl = ''),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: const Text('Remove'),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
               TextFormField(
                 controller: _name,
                 decoration: const InputDecoration(labelText: 'Full name'),
                 validator: _required,
+                onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -278,8 +317,41 @@ class _TechnicianEditorState extends State<_TechnicianEditor> {
         rating: double.parse(_rating.text),
         reviewCount: widget.technician?.reviewCount ?? 0,
         isAvailable: _available,
+        imageUrl: _imageUrl,
       ),
     );
+  }
+
+  Future<void> _pickImage() async {
+    setState(() => _isPickingImage = true);
+    try {
+      final image = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 75,
+      );
+      if (image == null) return;
+      final bytes = await image.readAsBytes();
+      if (!mounted) return;
+      if (bytes.length > 4 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Choose an image smaller than 4 MB.')),
+        );
+        return;
+      }
+      final extension = image.name.split('.').last.toLowerCase();
+      final mimeType = extension == 'png'
+          ? 'image/png'
+          : extension == 'webp'
+              ? 'image/webp'
+              : 'image/jpeg';
+      setState(() {
+        _imageUrl = 'data:$mimeType;base64,${base64Encode(bytes)}';
+      });
+    } finally {
+      if (mounted) setState(() => _isPickingImage = false);
+    }
   }
 }
 

@@ -7,6 +7,7 @@ class Technician {
     required this.rating,
     required this.reviewCount,
     required this.isAvailable,
+    this.imageUrl = '',
   });
 
   final String id;
@@ -16,4 +17,5 @@ class Technician {
   final double rating;
   final int reviewCount;
   final bool isAvailable;
+  final String imageUrl;
 }

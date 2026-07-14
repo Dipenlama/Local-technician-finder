@@ -18,6 +18,7 @@ class CreateBooking {
       id: 'booking-${now.microsecondsSinceEpoch}',
       technicianId: technician.id,
       technicianName: technician.name,
+      technicianImageUrl: technician.imageUrl,
       service: technician.profession,
       location: technician.location,
       address: address.trim(),

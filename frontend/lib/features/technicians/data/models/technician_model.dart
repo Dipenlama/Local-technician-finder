@@ -9,6 +9,7 @@ class TechnicianModel extends Technician {
     required super.rating,
     required super.reviewCount,
     required super.isAvailable,
+    super.imageUrl,
   });
 
   factory TechnicianModel.fromMap(Map<String, Object?> map) {
@@ -20,6 +21,7 @@ class TechnicianModel extends Technician {
       rating: (map['rating']! as num).toDouble(),
       reviewCount: map['reviewCount']! as int,
       isAvailable: map['isAvailable']! as bool,
+      imageUrl: map['imageUrl'] as String? ?? '',
     );
   }
 
@@ -31,5 +33,6 @@ class TechnicianModel extends Technician {
         'rating': rating,
         'reviewCount': reviewCount,
         'isAvailable': isAvailable,
+        'imageUrl': imageUrl,
       };
 }

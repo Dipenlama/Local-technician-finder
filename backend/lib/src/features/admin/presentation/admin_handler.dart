@@ -89,6 +89,7 @@ class AdminHandler {
         reviewCount: body['reviewCount'] as int? ?? 0,
         isAvailable: body['isAvailable'] as bool? ?? true,
         hourlyRate: (body['hourlyRate'] as num?)?.toDouble() ?? 0,
+        imageUrl: body['imageUrl'] as String? ?? '',
       ),
     );
     return successResponse({'id': id});

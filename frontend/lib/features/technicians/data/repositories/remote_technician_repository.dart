@@ -24,6 +24,7 @@ class RemoteTechnicianRepository implements TechnicianRepository {
             rating: (item['rating'] as num).toDouble(),
             reviewCount: item['reviewCount'] as int,
             isAvailable: item['isAvailable'] as bool,
+            imageUrl: item['imageUrl'] as String? ?? '',
           ),
         )
         .toList(growable: false);

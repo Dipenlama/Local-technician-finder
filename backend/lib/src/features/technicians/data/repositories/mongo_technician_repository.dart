@@ -62,6 +62,7 @@ class MongoTechnicianRepository implements TechnicianRepository {
     reviewCount: document['reviewCount'] as int,
     isAvailable: document['isAvailable'] as bool,
     hourlyRate: (document['hourlyRate'] as num).toDouble(),
+    imageUrl: document['imageUrl'] as String? ?? '',
   );
 
   Map<String, dynamic> _toDocument(Technician technician) => {
@@ -73,5 +74,6 @@ class MongoTechnicianRepository implements TechnicianRepository {
     'reviewCount': technician.reviewCount,
     'isAvailable': technician.isAvailable,
     'hourlyRate': technician.hourlyRate,
+    'imageUrl': technician.imageUrl,
   };
 }

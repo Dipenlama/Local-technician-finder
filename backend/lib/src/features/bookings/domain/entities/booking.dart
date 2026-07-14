@@ -13,6 +13,7 @@ class Booking {
     required this.createdAt,
     this.technicianName = '',
     this.location = '',
+    this.technicianImageUrl = '',
   });
 
   final String id;
@@ -26,6 +27,7 @@ class Booking {
   final DateTime createdAt;
   final String technicianName;
   final String location;
+  final String technicianImageUrl;
 
   Map<String, Object> toJson() => {
     'id': id,
@@ -39,5 +41,6 @@ class Booking {
     'createdAt': createdAt.toUtc().toIso8601String(),
     'technicianName': technicianName,
     'location': location,
+    'technicianImageUrl': technicianImageUrl,
   };
 }

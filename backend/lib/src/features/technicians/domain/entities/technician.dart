@@ -8,6 +8,7 @@ class Technician {
     required this.reviewCount,
     required this.isAvailable,
     required this.hourlyRate,
+    this.imageUrl = '',
   });
 
   final String id;
@@ -18,6 +19,7 @@ class Technician {
   final int reviewCount;
   final bool isAvailable;
   final double hourlyRate;
+  final String imageUrl;
 
   Map<String, Object> toJson() => {
     'id': id,
@@ -28,5 +30,6 @@ class Technician {
     'reviewCount': reviewCount,
     'isAvailable': isAvailable,
     'hourlyRate': hourlyRate,
+    'imageUrl': imageUrl,
   };
 }

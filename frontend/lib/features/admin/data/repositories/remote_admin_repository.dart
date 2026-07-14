@@ -59,6 +59,7 @@ class RemoteAdminRepository implements AdminRepository {
               rating: (item['rating'] as num).toDouble(),
               reviewCount: item['reviewCount'] as int,
               isAvailable: item['isAvailable'] as bool,
+              imageUrl: item['imageUrl'] as String? ?? '',
             ))
         .toList();
   }
@@ -72,6 +73,7 @@ class RemoteAdminRepository implements AdminRepository {
       'rating': technician.rating,
       'reviewCount': technician.reviewCount,
       'isAvailable': technician.isAvailable,
+      'imageUrl': technician.imageUrl,
     });
   }
 

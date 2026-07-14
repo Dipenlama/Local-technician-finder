@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
+import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 class CreateBookingPage extends StatefulWidget {
   const CreateBookingPage({
@@ -53,15 +54,10 @@ class _CreateBookingPageState extends State<CreateBookingPage> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      CircleAvatar(
+                      TechnicianAvatar(
+                        name: technician.name,
+                        imageUrl: technician.imageUrl,
                         radius: 28,
-                        child: Text(
-                          technician.name.substring(0, 1),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

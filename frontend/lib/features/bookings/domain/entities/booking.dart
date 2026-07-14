@@ -12,6 +12,7 @@ class Booking {
     required this.notes,
     required this.status,
     required this.createdAt,
+    this.technicianImageUrl = '',
   });
 
   final String id;
@@ -24,4 +25,5 @@ class Booking {
   final String notes;
   final BookingStatus status;
   final DateTime createdAt;
+  final String technicianImageUrl;
 }

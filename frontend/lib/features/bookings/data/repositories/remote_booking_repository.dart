@@ -41,5 +41,8 @@ class RemoteBookingRepository implements BookingRepository {
         notes: json['notes'] as String? ?? '',
         status: BookingStatus.values.byName(json['status'] as String),
         createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+        technicianImageUrl: json['technicianImageUrl'] as String? ??
+            fallback?.technicianImageUrl ??
+            '',
       );
 }

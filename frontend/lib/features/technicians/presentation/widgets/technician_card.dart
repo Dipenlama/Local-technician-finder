@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
+import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 class TechnicianCard extends StatelessWidget {
   const TechnicianCard({
@@ -18,12 +19,10 @@ class TechnicianCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            CircleAvatar(
+            TechnicianAvatar(
+              name: technician.name,
+              imageUrl: technician.imageUrl,
               radius: 28,
-              child: Text(
-                technician.name.substring(0, 1),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
             ),
             const SizedBox(width: 14),
             Expanded(

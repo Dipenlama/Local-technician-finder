@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/admin/presentation/widgets/admin_entity_dialogs.dart';
+import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 class AdminTechniciansTab extends StatelessWidget {
   const AdminTechniciansTab({required this.controller, super.key});
@@ -29,11 +30,9 @@ class AdminTechniciansTab extends StatelessWidget {
                   return Card(
                     child: ListTile(
                       contentPadding: const EdgeInsets.fromLTRB(14, 8, 6, 8),
-                      leading: CircleAvatar(
-                        child: Text(
-                          technician.name.substring(0, 1),
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
+                      leading: TechnicianAvatar(
+                        name: technician.name,
+                        imageUrl: technician.imageUrl,
                       ),
                       title: Text(
                         technician.name,

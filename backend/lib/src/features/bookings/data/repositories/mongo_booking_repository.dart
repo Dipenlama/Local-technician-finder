@@ -37,6 +37,7 @@ class MongoBookingRepository implements BookingRepository {
     createdAt: (document['createdAt'] as DateTime).toUtc(),
     technicianName: document['technicianName'] as String? ?? '',
     location: document['location'] as String? ?? '',
+    technicianImageUrl: document['technicianImageUrl'] as String? ?? '',
   );
 
   Map<String, dynamic> _toDocument(Booking booking) => {
@@ -51,5 +52,6 @@ class MongoBookingRepository implements BookingRepository {
     'createdAt': booking.createdAt,
     'technicianName': booking.technicianName,
     'location': booking.location,
+    'technicianImageUrl': booking.technicianImageUrl,
   };
 }

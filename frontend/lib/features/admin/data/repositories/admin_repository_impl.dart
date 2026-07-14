@@ -114,6 +114,7 @@ class AdminRepositoryImpl implements AdminRepository {
       rating: technician.rating,
       reviewCount: technician.reviewCount,
       isAvailable: technician.isAvailable,
+      imageUrl: technician.imageUrl,
     );
     final existing = await _technicianDataSource.getTechnicians();
     if (existing.any((item) => item.id == technician.id)) {
