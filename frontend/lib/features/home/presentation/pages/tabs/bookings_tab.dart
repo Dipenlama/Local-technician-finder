@@ -4,9 +4,14 @@ import 'package:mistrix/features/bookings/presentation/controllers/booking_contr
 import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
 
 class BookingsTab extends StatefulWidget {
-  const BookingsTab({required this.controller, super.key});
+  const BookingsTab({
+    required this.controller,
+    this.onNotificationsChanged,
+    super.key,
+  });
 
   final BookingController controller;
+  final VoidCallback? onNotificationsChanged;
 
   @override
   State<BookingsTab> createState() => _BookingsTabState();
@@ -123,6 +128,7 @@ class _BookingsTabState extends State<BookingsTab> {
         successful,
         successMessage: 'Booking rescheduled successfully.',
       );
+      if (successful) widget.onNotificationsChanged?.call();
       return;
     }
 
@@ -154,6 +160,7 @@ class _BookingsTabState extends State<BookingsTab> {
     if (!mounted) return;
     if (successful) {
       setState(() => _selectedStatus = BookingStatus.cancelled);
+      widget.onNotificationsChanged?.call();
     }
     _showResult(successful, successMessage: 'Booking cancelled.');
   }

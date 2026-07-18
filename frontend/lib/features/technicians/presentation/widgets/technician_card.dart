@@ -6,11 +6,17 @@ class TechnicianCard extends StatelessWidget {
   const TechnicianCard({
     required this.technician,
     this.onBook,
+    this.isFavorite = false,
+    this.isFavoriteUpdating = false,
+    this.onFavoriteToggle,
     super.key,
   });
 
   final Technician technician;
   final VoidCallback? onBook;
+  final bool isFavorite;
+  final bool isFavoriteUpdating;
+  final VoidCallback? onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +56,28 @@ class TechnicianCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (onFavoriteToggle != null)
+                  isFavoriteUpdating
+                      ? const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: SizedBox.square(
+                            dimension: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : IconButton(
+                          tooltip: isFavorite
+                              ? 'Remove from favourites'
+                              : 'Add to favourites',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: onFavoriteToggle,
+                          icon: Icon(
+                            isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: isFavorite ? Colors.red : Colors.blueGrey,
+                          ),
+                        ),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 9, vertical: 5),

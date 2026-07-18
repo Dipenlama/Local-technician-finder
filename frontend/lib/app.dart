@@ -9,6 +9,8 @@ import 'package:mistrix/features/auth/presentation/pages/signup_page.dart';
 import 'package:mistrix/features/auth/data/auth_api_service.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/home/presentation/pages/home_shell.dart';
+import 'package:mistrix/features/notifications/presentation/controllers/notification_controller.dart';
+import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mistrix/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/injection_container.dart';
@@ -27,6 +29,8 @@ class _MistrixAppState extends State<MistrixApp> {
   late final TechnicianController _controller;
   late final BookingController _bookingController;
   late final AdminController _adminController;
+  late final NotificationController _notificationController;
+  late final FavoriteController _favoriteController;
   AuthSession? _currentUser;
 
   @override
@@ -40,6 +44,12 @@ class _MistrixAppState extends State<MistrixApp> {
       widget.dependencies.updateBooking,
     )..load();
     _adminController = AdminController(widget.dependencies.adminRepository);
+    _notificationController = NotificationController(
+      widget.dependencies.notificationRepository,
+    );
+    _favoriteController = FavoriteController(
+      widget.dependencies.favoriteRepository,
+    );
     if (widget.dependencies.authApiService == null) {
       _adminController.load();
     }
@@ -50,6 +60,8 @@ class _MistrixAppState extends State<MistrixApp> {
     _controller.dispose();
     _bookingController.dispose();
     _adminController.dispose();
+    _notificationController.dispose();
+    _favoriteController.dispose();
     super.dispose();
   }
 
@@ -99,12 +111,16 @@ class _MistrixAppState extends State<MistrixApp> {
     _controller.load();
     _bookingController.load();
     _adminController.loadServices();
+    _notificationController.load();
+    _favoriteController.load();
     _navigatorKey.currentState!.pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (context) => HomeShell(
           technicianController: _controller,
           bookingController: _bookingController,
           adminController: _adminController,
+          notificationController: _notificationController,
+          favoriteController: _favoriteController,
           getTechnicians: widget.dependencies.getTechnicians,
           userName: user.name,
           userEmail: user.email,

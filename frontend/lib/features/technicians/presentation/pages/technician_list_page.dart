@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
+import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
 
 class TechnicianListPage extends StatefulWidget {
   const TechnicianListPage({
     required this.controller,
+    required this.favoriteController,
     this.embedded = false,
     this.onBook,
     super.key,
   });
 
   final TechnicianController controller;
+  final FavoriteController favoriteController;
   final bool embedded;
   final ValueChanged<Technician>? onBook;
 
@@ -59,7 +62,10 @@ class _TechnicianListPageState extends State<TechnicianListPage> {
             const SizedBox(height: 12),
             Expanded(
               child: ListenableBuilder(
-                listenable: widget.controller,
+                listenable: Listenable.merge([
+                  widget.controller,
+                  widget.favoriteController,
+                ]),
                 builder: (context, _) => _buildContent(),
               ),
             ),
@@ -113,6 +119,11 @@ class _TechnicianListPageState extends State<TechnicianListPage> {
             final technician = controller.technicians[index];
             return TechnicianCard(
               technician: technician,
+              isFavorite: widget.favoriteController.isFavorite(technician.id),
+              isFavoriteUpdating:
+                  widget.favoriteController.updatingIds.contains(technician.id),
+              onFavoriteToggle: () =>
+                  widget.favoriteController.toggle(technician),
               onBook: widget.onBook == null
                   ? null
                   : () => widget.onBook!(technician),

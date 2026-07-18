@@ -3,6 +3,8 @@ import 'package:mistrix/core/widgets/mistrix_logo.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
 import 'package:mistrix/features/home/presentation/widgets/service_category.dart';
+import 'package:mistrix/features/notifications/presentation/controllers/notification_controller.dart';
+import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
@@ -12,18 +14,24 @@ class DashboardTab extends StatelessWidget {
     required this.controller,
     required this.adminController,
     required this.userName,
+    required this.notificationController,
+    required this.favoriteController,
     required this.onExplore,
     required this.onServiceSelected,
     required this.onBook,
+    required this.onNotifications,
     super.key,
   });
 
   final TechnicianController controller;
   final AdminController adminController;
   final String userName;
+  final NotificationController notificationController;
+  final FavoriteController favoriteController;
   final VoidCallback onExplore;
   final ValueChanged<ServiceCategoryData> onServiceSelected;
   final ValueChanged<Technician> onBook;
+  final VoidCallback onNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +49,18 @@ class DashboardTab extends StatelessWidget {
                     children: [
                       const MistrixLogo(compact: true),
                       const Spacer(),
-                      IconButton.filledTonal(
-                        onPressed: () {},
-                        icon: const Badge(
-                          smallSize: 7,
-                          child: Icon(Icons.notifications_none_rounded),
+                      ListenableBuilder(
+                        listenable: notificationController,
+                        builder: (context, _) => IconButton.filledTonal(
+                          onPressed: onNotifications,
+                          icon: Badge.count(
+                            count: notificationController.unreadCount,
+                            isLabelVisible:
+                                notificationController.unreadCount > 0,
+                            child: const Icon(
+                              Icons.notifications_none_rounded,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -163,7 +178,7 @@ class DashboardTab extends StatelessWidget {
               ),
             ),
             ListenableBuilder(
-              listenable: controller,
+              listenable: Listenable.merge([controller, favoriteController]),
               builder: (context, _) {
                 if (controller.status == TechnicianStatus.loading) {
                   return const SliverToBoxAdapter(
@@ -179,6 +194,14 @@ class DashboardTab extends StatelessWidget {
                     itemCount: controller.technicians.take(3).length,
                     itemBuilder: (context, index) => TechnicianCard(
                       technician: controller.technicians[index],
+                      isFavorite: favoriteController.isFavorite(
+                        controller.technicians[index].id,
+                      ),
+                      isFavoriteUpdating: favoriteController.updatingIds
+                          .contains(controller.technicians[index].id),
+                      onFavoriteToggle: () => favoriteController.toggle(
+                        controller.technicians[index],
+                      ),
                       onBook: () => onBook(controller.technicians[index]),
                     ),
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
