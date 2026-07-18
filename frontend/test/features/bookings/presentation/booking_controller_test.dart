@@ -5,6 +5,7 @@ import 'package:mistrix/features/bookings/domain/entities/booking.dart';
 import 'package:mistrix/features/bookings/domain/repositories/booking_repository.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/create_booking.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/get_bookings.dart';
+import 'package:mistrix/features/bookings/domain/use_cases/update_booking.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/home/presentation/pages/tabs/bookings_tab.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
@@ -15,6 +16,7 @@ void main() {
     final controller = BookingController(
       CreateBooking(repository),
       GetBookings(repository),
+      UpdateBooking(repository),
     );
     addTearDown(controller.dispose);
 
@@ -57,6 +59,7 @@ void main() {
     final controller = BookingController(
       CreateBooking(repository),
       GetBookings(repository),
+      UpdateBooking(repository),
     );
     addTearDown(controller.dispose);
     await controller.load();
@@ -74,6 +77,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Cancelled Technician'), findsOneWidget);
     expect(find.text('Completed Technician'), findsNothing);
+  });
+
+  test('client can reschedule and cancel an active booking', () async {
+    final repository = _StatusBookingRepository([
+      _booking('active-booking', 'Active Technician', BookingStatus.pending),
+    ]);
+    final controller = BookingController(
+      CreateBooking(repository),
+      GetBookings(repository),
+      UpdateBooking(repository),
+    );
+    addTearDown(controller.dispose);
+    await controller.load();
+
+    final newDate = DateTime(2026, 8, 10, 14, 30);
+    expect(
+      await controller.reschedule(controller.bookings.single, newDate),
+      isTrue,
+    );
+    expect(controller.bookings.single.scheduledAt, newDate);
+
+    expect(await controller.cancel(controller.bookings.single), isTrue);
+    expect(controller.bookings.single.status, BookingStatus.cancelled);
   });
 }
 
@@ -102,4 +128,20 @@ class _StatusBookingRepository implements BookingRepository {
 
   @override
   Future<List<Booking>> getBookings() async => List.unmodifiable(bookings);
+
+  @override
+  Future<Booking> rescheduleBooking(String id, DateTime scheduledAt) async {
+    final index = bookings.indexWhere((booking) => booking.id == id);
+    final updated = bookings[index].copyWith(scheduledAt: scheduledAt);
+    bookings[index] = updated;
+    return updated;
+  }
+
+  @override
+  Future<Booking> cancelBooking(String id) async {
+    final index = bookings.indexWhere((booking) => booking.id == id);
+    final updated = bookings[index].copyWith(status: BookingStatus.cancelled);
+    bookings[index] = updated;
+    return updated;
+  }
 }

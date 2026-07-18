@@ -37,6 +37,7 @@ class _MistrixAppState extends State<MistrixApp> {
     _bookingController = BookingController(
       widget.dependencies.createBooking,
       widget.dependencies.getBookings,
+      widget.dependencies.updateBooking,
     )..load();
     _adminController = AdminController(widget.dependencies.adminRepository);
     if (widget.dependencies.authApiService == null) {

@@ -7,6 +7,7 @@ import 'package:mistrix/features/auth/data/auth_api_service.dart';
 import 'package:mistrix/core/network/api_client.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/create_booking.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/get_bookings.dart';
+import 'package:mistrix/features/bookings/domain/use_cases/update_booking.dart';
 import 'package:mistrix/features/technicians/data/data_sources/technician_local_data_source.dart';
 import 'package:mistrix/features/technicians/data/repositories/technician_repository_impl.dart';
 import 'package:mistrix/features/technicians/data/repositories/remote_technician_repository.dart';
@@ -19,6 +20,7 @@ class AppDependencies {
     required this.getTechnicians,
     required this.createBooking,
     required this.getBookings,
+    required this.updateBooking,
     required this.adminRepository,
     this.authApiService,
   });
@@ -26,6 +28,7 @@ class AppDependencies {
   final GetTechnicians getTechnicians;
   final CreateBooking createBooking;
   final GetBookings getBookings;
+  final UpdateBooking updateBooking;
   final AdminRepository adminRepository;
   final AuthApiService? authApiService;
 }
@@ -42,11 +45,13 @@ AppDependencies configureDependencies({bool useRemote = true}) {
       : InMemoryBookingRepository();
   final createBooking = CreateBooking(bookingRepository);
   final getBookings = GetBookings(bookingRepository);
+  final updateBooking = UpdateBooking(bookingRepository);
 
   return AppDependencies(
     getTechnicians: getTechnicians,
     createBooking: createBooking,
     getBookings: getBookings,
+    updateBooking: updateBooking,
     adminRepository: useRemote
         ? RemoteAdminRepository(apiClient)
         : AdminRepositoryImpl(dataSource),

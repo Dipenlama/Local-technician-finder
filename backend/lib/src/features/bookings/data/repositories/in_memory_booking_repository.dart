@@ -17,4 +17,20 @@ class InMemoryBookingRepository implements BookingRepository {
     bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return bookings;
   }
+
+  @override
+  Future<Booking?> findById(String id) async {
+    for (final booking in _bookings) {
+      if (booking.id == id) return booking;
+    }
+    return null;
+  }
+
+  @override
+  Future<Booking> update(Booking booking) async {
+    final index = _bookings.indexWhere((item) => item.id == booking.id);
+    if (index == -1) throw StateError('Booking not found.');
+    _bookings[index] = booking;
+    return booking;
+  }
 }

@@ -29,6 +29,22 @@ class RemoteBookingRepository implements BookingRepository {
         .toList(growable: false);
   }
 
+  @override
+  Future<Booking> rescheduleBooking(String id, DateTime scheduledAt) async {
+    final data = await _client.put('/bookings/$id', {
+      'scheduledAt': scheduledAt.toUtc().toIso8601String(),
+    }) as Map<String, dynamic>;
+    return _fromJson(data);
+  }
+
+  @override
+  Future<Booking> cancelBooking(String id) async {
+    final data = await _client.put('/bookings/$id', {
+      'status': BookingStatus.cancelled.name,
+    }) as Map<String, dynamic>;
+    return _fromJson(data);
+  }
+
   Booking _fromJson(Map<String, dynamic> json, {Booking? fallback}) => Booking(
         id: json['id'] as String,
         technicianId: json['technicianId'] as String,

@@ -28,6 +28,7 @@ class BookingHandler {
     final router = Router();
     router.get('/', _findMine);
     router.post('/', _create);
+    router.put('/<id>', _updateMine);
     return router;
   }
 
@@ -87,5 +88,41 @@ class BookingHandler {
     );
     await _bookingRepository.create(booking);
     return successResponse(booking.toJson(), statusCode: 201);
+  }
+
+  Future<Response> _updateMine(Request request, String id) async {
+    final user = await _authService.userFromRequest(request);
+    final booking = await _bookingRepository.findById(id);
+    if (booking == null || booking.customerId != user.id) {
+      throw const ApiException(404, 'Booking not found.');
+    }
+    if (booking.status == BookingStatus.completed ||
+        booking.status == BookingStatus.cancelled) {
+      throw const ApiException(409, 'This booking can no longer be changed.');
+    }
+
+    final body = await readJsonObject(request);
+    final statusValue = body['status'] as String?;
+    if (statusValue != null && statusValue != BookingStatus.cancelled.name) {
+      throw const ApiException(422, 'Clients can only cancel a booking.');
+    }
+
+    DateTime? scheduledAt;
+    if (body['scheduledAt'] != null) {
+      scheduledAt = DateTime.tryParse(body['scheduledAt'] as String);
+      if (scheduledAt == null || !scheduledAt.isAfter(DateTime.now())) {
+        throw const ApiException(422, 'Choose a future date and time.');
+      }
+    }
+    if (statusValue == null && scheduledAt == null) {
+      throw const ApiException(422, 'No booking changes were provided.');
+    }
+
+    final updated = booking.copyWith(
+      scheduledAt: scheduledAt?.toUtc(),
+      status: statusValue == null ? null : BookingStatus.cancelled,
+    );
+    await _bookingRepository.update(updated);
+    return successResponse(updated.toJson());
   }
 }

@@ -29,6 +29,23 @@ class Booking {
   final String location;
   final String technicianImageUrl;
 
+  Booking copyWith({DateTime? scheduledAt, BookingStatus? status}) {
+    return Booking(
+      id: id,
+      customerId: customerId,
+      technicianId: technicianId,
+      service: service,
+      address: address,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      status: status ?? this.status,
+      notes: notes,
+      createdAt: createdAt,
+      technicianName: technicianName,
+      location: location,
+      technicianImageUrl: technicianImageUrl,
+    );
+  }
+
   Map<String, Object> toJson() => {
     'id': id,
     'customerId': customerId,

@@ -98,16 +98,121 @@ class _BookingsTabState extends State<BookingsTab> {
         padding: const EdgeInsets.only(bottom: 24),
         itemCount: bookings.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) => _BookingCard(booking: bookings[index]),
+        itemBuilder: (context, index) {
+          final booking = bookings[index];
+          return _BookingCard(
+            booking: booking,
+            isUpdating: widget.controller.updatingBookingId == booking.id,
+            onAction: (action) => _handleAction(booking, action),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleAction(Booking booking, String action) async {
+    if (action == 'reschedule') {
+      final scheduledAt = await _pickSchedule(booking.scheduledAt);
+      if (scheduledAt == null) return;
+      final successful = await widget.controller.reschedule(
+        booking,
+        scheduledAt,
+      );
+      if (!mounted) return;
+      _showResult(
+        successful,
+        successMessage: 'Booking rescheduled successfully.',
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+            title: const Text('Cancel booking?'),
+            content: Text(
+              'Your booking with ${booking.technicianName} will be cancelled.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Keep booking'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('Cancel booking'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed) return;
+
+    final successful = await widget.controller.cancel(booking);
+    if (!mounted) return;
+    if (successful) {
+      setState(() => _selectedStatus = BookingStatus.cancelled);
+    }
+    _showResult(successful, successMessage: 'Booking cancelled.');
+  }
+
+  Future<DateTime?> _pickSchedule(DateTime current) async {
+    final now = DateTime.now();
+    final initial =
+        current.isAfter(now) ? current : now.add(const Duration(days: 1));
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (date == null || !mounted) return null;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
+    if (time == null || !mounted) return null;
+    final scheduledAt = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    if (!scheduledAt.isAfter(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose a future date and time.')),
+      );
+      return null;
+    }
+    return scheduledAt;
+  }
+
+  void _showResult(bool successful, {required String successMessage}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          successful
+              ? successMessage
+              : widget.controller.errorMessage ?? 'Could not update booking.',
+        ),
       ),
     );
   }
 }
 
 class _BookingCard extends StatelessWidget {
-  const _BookingCard({required this.booking});
+  const _BookingCard({
+    required this.booking,
+    required this.isUpdating,
+    required this.onAction,
+  });
 
   final Booking booking;
+  final bool isUpdating;
+  final ValueChanged<String> onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -148,21 +253,54 @@ class _BookingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    booking.status.name,
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        booking.status.name,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (booking.status == BookingStatus.pending ||
+                        booking.status == BookingStatus.confirmed)
+                      isUpdating
+                          ? const Padding(
+                              padding: EdgeInsets.only(top: 10, right: 8),
+                              child: SizedBox.square(
+                                dimension: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : PopupMenuButton<String>(
+                              tooltip: 'Manage booking',
+                              onSelected: onAction,
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(
+                                  value: 'reschedule',
+                                  child: Text('Reschedule'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'cancel',
+                                  child: Text('Cancel booking'),
+                                ),
+                              ],
+                            ),
+                  ],
                 ),
               ],
             ),

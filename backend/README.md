@@ -37,6 +37,7 @@ Set `MONGODB_URI` to use a different local database or MongoDB Atlas cluster.
 | GET | `/api/v1/technicians/<id>` | No |
 | GET | `/api/v1/bookings` | Bearer token |
 | POST | `/api/v1/bookings` | Bearer token |
+| PUT | `/api/v1/bookings/<id>` | Booking owner bearer token |
 | GET | `/api/v1/admin/bookings` | Admin bearer token |
 | PUT | `/api/v1/admin/bookings/<id>` | Admin bearer token |
 

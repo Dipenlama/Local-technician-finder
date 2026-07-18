@@ -25,6 +25,21 @@ class MongoBookingRepository implements BookingRepository {
     return bookings;
   }
 
+  @override
+  Future<Booking?> findById(String id) async {
+    final document = await _database.bookings.findOne(where.eq('_id', id));
+    return document == null ? null : _fromDocument(document);
+  }
+
+  @override
+  Future<Booking> update(Booking booking) async {
+    await _database.bookings.replaceOne(
+      where.eq('_id', booking.id),
+      _toDocument(booking),
+    );
+    return booking;
+  }
+
   Booking _fromDocument(Map<String, dynamic> document) => Booking(
     id: document['_id'] as String,
     customerId: document['customerId'] as String,

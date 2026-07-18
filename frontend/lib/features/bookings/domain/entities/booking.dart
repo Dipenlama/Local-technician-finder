@@ -26,4 +26,20 @@ class Booking {
   final BookingStatus status;
   final DateTime createdAt;
   final String technicianImageUrl;
+
+  Booking copyWith({DateTime? scheduledAt, BookingStatus? status}) {
+    return Booking(
+      id: id,
+      technicianId: technicianId,
+      technicianName: technicianName,
+      service: service,
+      location: location,
+      address: address,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      notes: notes,
+      status: status ?? this.status,
+      createdAt: createdAt,
+      technicianImageUrl: technicianImageUrl,
+    );
+  }
 }
