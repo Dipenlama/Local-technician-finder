@@ -8,6 +8,10 @@ import 'package:mistrix/features/home/presentation/pages/tabs/dashboard_tab.dart
 import 'package:mistrix/features/home/presentation/pages/tabs/profile_tab.dart';
 import 'package:mistrix/features/home/presentation/pages/personal_information_page.dart';
 import 'package:mistrix/features/home/presentation/widgets/service_category.dart';
+import 'package:mistrix/features/notifications/presentation/controllers/notification_controller.dart';
+import 'package:mistrix/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
+import 'package:mistrix/features/favorites/presentation/pages/favorite_technicians_page.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/pages/technician_list_page.dart';
 import 'package:mistrix/features/technicians/presentation/pages/service_technicians_page.dart';
@@ -19,6 +23,8 @@ class HomeShell extends StatefulWidget {
     required this.technicianController,
     required this.bookingController,
     required this.adminController,
+    required this.notificationController,
+    required this.favoriteController,
     required this.getTechnicians,
     required this.userName,
     required this.userEmail,
@@ -31,6 +37,8 @@ class HomeShell extends StatefulWidget {
   final TechnicianController technicianController;
   final BookingController bookingController;
   final AdminController adminController;
+  final NotificationController notificationController;
+  final FavoriteController favoriteController;
   final GetTechnicians getTechnicians;
   final String userName;
   final String userEmail;
@@ -62,22 +70,30 @@ class _HomeShellState extends State<HomeShell> {
       DashboardTab(
         controller: widget.technicianController,
         adminController: widget.adminController,
+        notificationController: widget.notificationController,
+        favoriteController: widget.favoriteController,
         userName: _userName,
         onExplore: () => setState(() => _selectedIndex = 1),
         onServiceSelected: _openService,
         onBook: _openBooking,
+        onNotifications: _openNotifications,
       ),
       TechnicianListPage(
         controller: widget.technicianController,
+        favoriteController: widget.favoriteController,
         embedded: true,
         onBook: _openBooking,
       ),
-      BookingsTab(controller: widget.bookingController),
+      BookingsTab(
+        controller: widget.bookingController,
+        onNotificationsChanged: widget.notificationController.load,
+      ),
       ProfileTab(
         userName: _userName,
         userEmail: _userEmail,
         userPhone: _userPhone,
         onEditPersonalInformation: _openPersonalInformation,
+        onFavoriteTechnicians: _openFavorites,
         onLogout: widget.onLogout,
       ),
     ];
@@ -133,6 +149,7 @@ class _HomeShellState extends State<HomeShell> {
           serviceName: service.label,
           query: service.query!,
           getTechnicians: widget.getTechnicians,
+          favoriteController: widget.favoriteController,
           onBook: _openBooking,
         ),
       ),
@@ -150,8 +167,34 @@ class _HomeShellState extends State<HomeShell> {
     );
     if (!mounted || successful != true) return;
 
+    widget.notificationController.load();
     setState(() => _selectedIndex = 2);
     Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
+  Future<void> _openNotifications() async {
+    await widget.notificationController.load();
+    if (!mounted) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (context) => NotificationsPage(
+          controller: widget.notificationController,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openFavorites() async {
+    await widget.favoriteController.load();
+    if (!mounted) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (context) => FavoriteTechniciansPage(
+          controller: widget.favoriteController,
+          onBook: _openBooking,
+        ),
+      ),
+    );
   }
 
   Future<void> _openPersonalInformation() async {

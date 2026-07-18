@@ -8,6 +8,12 @@ import 'package:mistrix/core/network/api_client.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/create_booking.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/get_bookings.dart';
 import 'package:mistrix/features/bookings/domain/use_cases/update_booking.dart';
+import 'package:mistrix/features/notifications/data/repositories/in_memory_notification_repository.dart';
+import 'package:mistrix/features/notifications/data/repositories/remote_notification_repository.dart';
+import 'package:mistrix/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:mistrix/features/favorites/data/repositories/in_memory_favorite_repository.dart';
+import 'package:mistrix/features/favorites/data/repositories/remote_favorite_repository.dart';
+import 'package:mistrix/features/favorites/domain/repositories/favorite_repository.dart';
 import 'package:mistrix/features/technicians/data/data_sources/technician_local_data_source.dart';
 import 'package:mistrix/features/technicians/data/repositories/technician_repository_impl.dart';
 import 'package:mistrix/features/technicians/data/repositories/remote_technician_repository.dart';
@@ -22,6 +28,8 @@ class AppDependencies {
     required this.getBookings,
     required this.updateBooking,
     required this.adminRepository,
+    required this.notificationRepository,
+    required this.favoriteRepository,
     this.authApiService,
   });
 
@@ -30,6 +38,8 @@ class AppDependencies {
   final GetBookings getBookings;
   final UpdateBooking updateBooking;
   final AdminRepository adminRepository;
+  final NotificationRepository notificationRepository;
+  final FavoriteRepository favoriteRepository;
   final AuthApiService? authApiService;
 }
 
@@ -55,6 +65,12 @@ AppDependencies configureDependencies({bool useRemote = true}) {
     adminRepository: useRemote
         ? RemoteAdminRepository(apiClient)
         : AdminRepositoryImpl(dataSource),
+    notificationRepository: useRemote
+        ? RemoteNotificationRepository(apiClient)
+        : InMemoryNotificationRepository(),
+    favoriteRepository: useRemote
+        ? RemoteFavoriteRepository(apiClient)
+        : InMemoryFavoriteRepository(),
     authApiService: useRemote ? AuthApiService(apiClient) : null,
   );
 }

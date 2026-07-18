@@ -3,6 +3,7 @@ import 'package:mistrix/features/technicians/domain/use_cases/get_technicians.da
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
+import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
 
 class ServiceTechniciansPage extends StatefulWidget {
   const ServiceTechniciansPage({
@@ -10,6 +11,7 @@ class ServiceTechniciansPage extends StatefulWidget {
     required this.query,
     required this.getTechnicians,
     required this.onBook,
+    required this.favoriteController,
     super.key,
   });
 
@@ -17,6 +19,7 @@ class ServiceTechniciansPage extends StatefulWidget {
   final String query;
   final GetTechnicians getTechnicians;
   final ValueChanged<Technician> onBook;
+  final FavoriteController favoriteController;
 
   @override
   State<ServiceTechniciansPage> createState() => _ServiceTechniciansPageState();
@@ -44,7 +47,8 @@ class _ServiceTechniciansPageState extends State<ServiceTechniciansPage> {
       appBar: AppBar(title: Text(widget.serviceName)),
       body: SafeArea(
         child: ListenableBuilder(
-          listenable: _controller,
+          listenable:
+              Listenable.merge([_controller, widget.favoriteController]),
           builder: (context, _) {
             return switch (_controller.status) {
               TechnicianStatus.initial ||
@@ -73,10 +77,18 @@ class _ServiceTechniciansPageState extends State<ServiceTechniciansPage> {
                           count: _controller.technicians.length,
                         );
                       }
+                      final technician = _controller.technicians[index - 1];
                       return TechnicianCard(
-                        technician: _controller.technicians[index - 1],
+                        technician: technician,
+                        isFavorite:
+                            widget.favoriteController.isFavorite(technician.id),
+                        isFavoriteUpdating: widget
+                            .favoriteController.updatingIds
+                            .contains(technician.id),
+                        onFavoriteToggle: () =>
+                            widget.favoriteController.toggle(technician),
                         onBook: () => widget.onBook(
-                          _controller.technicians[index - 1],
+                          technician,
                         ),
                       );
                     },

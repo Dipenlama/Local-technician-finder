@@ -6,6 +6,7 @@ class ProfileTab extends StatelessWidget {
     required this.userEmail,
     required this.userPhone,
     required this.onEditPersonalInformation,
+    required this.onFavoriteTechnicians,
     required this.onLogout,
     super.key,
   });
@@ -14,6 +15,7 @@ class ProfileTab extends StatelessWidget {
   final String userEmail;
   final String userPhone;
   final VoidCallback onEditPersonalInformation;
+  final VoidCallback onFavoriteTechnicians;
   final VoidCallback onLogout;
 
   @override
@@ -90,7 +92,7 @@ class ProfileTab extends StatelessWidget {
                 _ProfileTile(
                     icon: Icons.favorite_border_rounded,
                     title: 'Favourite technicians',
-                    onTap: () {}),
+                    onTap: onFavoriteTechnicians),
               ],
             ),
           ),
@@ -98,11 +100,6 @@ class ProfileTab extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _ProfileTile(
-                    icon: Icons.notifications_none_rounded,
-                    title: 'Notifications',
-                    onTap: () {}),
-                const Divider(height: 1, indent: 58),
                 _ProfileTile(
                     icon: Icons.help_outline_rounded,
                     title: 'Help and support',
