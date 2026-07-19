@@ -12,6 +12,13 @@ import 'package:mistrix_backend/src/features/technicians/data/repositories/mongo
 import 'package:mistrix_backend/src/features/bookings/data/repositories/in_memory_booking_repository.dart';
 import 'package:mistrix_backend/src/features/bookings/domain/repositories/booking_repository.dart';
 import 'package:mistrix_backend/src/features/bookings/presentation/booking_handler.dart';
+import 'package:mistrix_backend/src/features/notifications/data/repositories/in_memory_notification_repository.dart';
+import 'package:mistrix_backend/src/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:mistrix_backend/src/features/notifications/domain/services/notification_service.dart';
+import 'package:mistrix_backend/src/features/notifications/presentation/notification_handler.dart';
+import 'package:mistrix_backend/src/features/favorites/data/repositories/in_memory_favorite_repository.dart';
+import 'package:mistrix_backend/src/features/favorites/domain/repositories/favorite_repository.dart';
+import 'package:mistrix_backend/src/features/favorites/presentation/favorite_handler.dart';
 import 'package:mistrix_backend/src/features/technicians/data/repositories/in_memory_technician_repository.dart';
 import 'package:mistrix_backend/src/features/technicians/domain/repositories/technician_repository.dart';
 import 'package:mistrix_backend/src/features/technicians/presentation/technician_handler.dart';
@@ -25,6 +32,8 @@ class MistrixBackend {
     UserRepository? userRepository,
     TechnicianRepository? technicianRepository,
     BookingRepository? bookingRepository,
+    NotificationRepository? notificationRepository,
+    FavoriteRepository? favoriteRepository,
     MongoDatabase? database,
   }) {
     final idGenerator = IdGenerator();
@@ -32,10 +41,18 @@ class MistrixBackend {
     final resolvedTechnicians =
         technicianRepository ?? const InMemoryTechnicianRepository();
     final resolvedBookings = bookingRepository ?? InMemoryBookingRepository();
+    final resolvedNotifications =
+        notificationRepository ?? InMemoryNotificationRepository();
+    final resolvedFavorites =
+        favoriteRepository ?? InMemoryFavoriteRepository();
     final authService = AuthService(
       userRepository: resolvedUsers,
       idGenerator: idGenerator,
       jwtSecret: config.jwtSecret,
+    );
+    final notificationService = NotificationService(
+      repository: resolvedNotifications,
+      idGenerator: idGenerator,
     );
 
     _authHandler = AuthHandler(authService);
@@ -45,6 +62,16 @@ class MistrixBackend {
       bookingRepository: resolvedBookings,
       technicianRepository: resolvedTechnicians,
       idGenerator: idGenerator,
+      notificationService: notificationService,
+    );
+    _notificationHandler = NotificationHandler(
+      authService: authService,
+      repository: resolvedNotifications,
+    );
+    _favoriteHandler = FavoriteHandler(
+      authService: authService,
+      repository: resolvedFavorites,
+      technicians: resolvedTechnicians,
     );
     if (database != null && resolvedTechnicians is MongoTechnicianRepository) {
       _serviceHandler = ServiceHandler(database);
@@ -52,6 +79,7 @@ class MistrixBackend {
         database: database,
         authService: authService,
         technicians: resolvedTechnicians,
+        notificationService: notificationService,
       );
     }
   }
@@ -60,6 +88,8 @@ class MistrixBackend {
   late final AuthHandler _authHandler;
   late final TechnicianHandler _technicianHandler;
   late final BookingHandler _bookingHandler;
+  late final NotificationHandler _notificationHandler;
+  late final FavoriteHandler _favoriteHandler;
   AdminHandler? _adminHandler;
   ServiceHandler? _serviceHandler;
 
@@ -75,6 +105,8 @@ class MistrixBackend {
     router.mount('/api/v1/auth/', _authHandler.router.call);
     router.mount('/api/v1/technicians/', _technicianHandler.router.call);
     router.mount('/api/v1/bookings/', _bookingHandler.router.call);
+    router.mount('/api/v1/notifications/', _notificationHandler.router.call);
+    router.mount('/api/v1/favorites/', _favoriteHandler.router.call);
     if (_serviceHandler != null) {
       router.mount('/api/v1/services/', _serviceHandler!.router.call);
     }

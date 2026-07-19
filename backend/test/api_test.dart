@@ -134,5 +134,83 @@ void main() {
         jsonDecode(await cancelResponse.readAsString()) as Map<String, dynamic>;
     final cancelled = cancelBody['data'] as Map<String, dynamic>;
     expect(cancelled['status'], 'cancelled');
+
+    final notificationsResponse = await handler(
+      Request(
+        'GET',
+        Uri.parse('http://localhost/api/v1/notifications/'),
+        headers: headers,
+      ),
+    );
+    expect(notificationsResponse.statusCode, 200);
+    final notificationsBody =
+        jsonDecode(await notificationsResponse.readAsString())
+            as Map<String, dynamic>;
+    final notificationsData = notificationsBody['data'] as Map<String, dynamic>;
+    expect(notificationsData['unreadCount'], 3);
+    final notifications = notificationsData['items'] as List<dynamic>;
+    expect(notifications, hasLength(3));
+
+    final markAllResponse = await handler(
+      Request(
+        'PUT',
+        Uri.parse('http://localhost/api/v1/notifications/read-all'),
+        headers: headers,
+      ),
+    );
+    expect(markAllResponse.statusCode, 200);
+  });
+
+  test('client can add, list, and remove a favourite technician', () async {
+    final signupResponse = await handler(
+      Request(
+        'POST',
+        Uri.parse('http://localhost/api/v1/auth/signup'),
+        headers: {'content-type': 'application/json'},
+        body: jsonEncode({
+          'name': 'Favourite Client',
+          'email': 'favourite-client@mistrix.app',
+          'phone': '9800000002',
+          'password': 'password123',
+        }),
+      ),
+    );
+    final signupBody =
+        jsonDecode(await signupResponse.readAsString()) as Map<String, dynamic>;
+    final signupData = signupBody['data'] as Map<String, dynamic>;
+    final headers = {
+      'content-type': 'application/json',
+      'authorization': 'Bearer ${signupData['token']}',
+    };
+
+    final addResponse = await handler(
+      Request(
+        'PUT',
+        Uri.parse('http://localhost/api/v1/favorites/tech-001'),
+        headers: headers,
+      ),
+    );
+    expect(addResponse.statusCode, 200);
+
+    final listResponse = await handler(
+      Request(
+        'GET',
+        Uri.parse('http://localhost/api/v1/favorites/'),
+        headers: headers,
+      ),
+    );
+    final listBody =
+        jsonDecode(await listResponse.readAsString()) as Map<String, dynamic>;
+    final listData = listBody['data'] as Map<String, dynamic>;
+    expect(listData['count'], 1);
+
+    final removeResponse = await handler(
+      Request(
+        'DELETE',
+        Uri.parse('http://localhost/api/v1/favorites/tech-001'),
+        headers: headers,
+      ),
+    );
+    expect(removeResponse.statusCode, 200);
   });
 }
