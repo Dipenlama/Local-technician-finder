@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/features/home/presentation/pages/about_mistrix_page.dart';
+import 'package:mistrix/features/home/presentation/pages/help_support_page.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({
@@ -103,12 +105,20 @@ class ProfileTab extends StatelessWidget {
                 _ProfileTile(
                     icon: Icons.help_outline_rounded,
                     title: 'Help and support',
-                    onTap: () {}),
+                    onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => const HelpSupportPage(),
+                          ),
+                        )),
                 const Divider(height: 1, indent: 58),
                 _ProfileTile(
                     icon: Icons.info_outline_rounded,
                     title: 'About Mistrix',
-                    onTap: () {}),
+                    onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => const AboutMistrixPage(),
+                          ),
+                        )),
               ],
             ),
           ),
