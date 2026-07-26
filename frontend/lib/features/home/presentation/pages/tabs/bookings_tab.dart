@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/bookings/domain/entities/booking.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
@@ -24,43 +25,64 @@ class _BookingsTabState extends State<BookingsTab> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'My bookings',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+              decoration: BoxDecoration(
+                color: AppColors.primarySoft,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Text(
+                'YOUR SERVICE JOURNEY',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
             ),
+            const SizedBox(height: 12),
+            Text('My bookings',
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 6),
-            Text(
+            const Text(
               'Manage your upcoming and past services.',
-              style: TextStyle(color: Colors.blueGrey.shade600),
+              style: TextStyle(color: AppColors.inkMuted),
             ),
-            const SizedBox(height: 22),
-            SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<BookingStatus>(
-                segments: const [
-                  ButtonSegment(
-                    value: BookingStatus.confirmed,
-                    label: Text('Upcoming'),
-                  ),
-                  ButtonSegment(
-                    value: BookingStatus.completed,
-                    label: Text('Completed'),
-                  ),
-                  ButtonSegment(
-                    value: BookingStatus.cancelled,
-                    label: Text('Cancelled'),
-                  ),
-                ],
-                selected: {_selectedStatus},
-                onSelectionChanged: (selection) {
-                  setState(() => _selectedStatus = selection.first);
-                },
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.outline),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<BookingStatus>(
+                  segments: const [
+                    ButtonSegment(
+                      value: BookingStatus.confirmed,
+                      label: Text('Upcoming'),
+                    ),
+                    ButtonSegment(
+                      value: BookingStatus.completed,
+                      label: Text('Completed'),
+                    ),
+                    ButtonSegment(
+                      value: BookingStatus.cancelled,
+                      label: Text('Cancelled'),
+                    ),
+                  ],
+                  selected: {_selectedStatus},
+                  onSelectionChanged: (selection) {
+                    setState(() => _selectedStatus = selection.first);
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 18),
@@ -102,7 +124,7 @@ class _BookingsTabState extends State<BookingsTab> {
       child: ListView.separated(
         padding: const EdgeInsets.only(bottom: 24),
         itemCount: bookings.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, __) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
           final booking = bookings[index];
           return _BookingCard(
@@ -234,7 +256,7 @@ class _BookingCard extends StatelessWidget {
     };
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(17),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -256,7 +278,14 @@ class _BookingCard extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      Text(booking.service),
+                      const SizedBox(height: 2),
+                      Text(
+                        booking.service,
+                        style: const TextStyle(
+                          color: AppColors.inkMuted,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -276,8 +305,9 @@ class _BookingCard extends StatelessWidget {
                         booking.status.name,
                         style: TextStyle(
                           color: statusColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
@@ -311,7 +341,7 @@ class _BookingCard extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 28),
+            const Divider(height: 30),
             _BookingDetail(
               icon: Icons.calendar_today_outlined,
               text: _formatSchedule(context, booking.scheduledAt),
@@ -365,9 +395,21 @@ class _BookingDetail extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 19, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(width: 9),
-        Expanded(child: Text(text)),
+        Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 17, color: AppColors.primary),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(color: AppColors.inkMuted, height: 1.35),
+          ),
+        ),
       ],
     );
   }
@@ -392,13 +434,13 @@ class _EmptyBookings extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+            decoration: const BoxDecoration(
+              color: AppColors.primarySoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.calendar_month_outlined,
-              color: Theme.of(context).colorScheme.primary,
+              color: AppColors.primary,
               size: 58,
             ),
           ),
@@ -410,9 +452,9 @@ class _EmptyBookings extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Your booked services will appear here.',
-            style: TextStyle(color: Colors.blueGrey.shade600),
+            style: TextStyle(color: AppColors.inkMuted),
           ),
         ],
       ),

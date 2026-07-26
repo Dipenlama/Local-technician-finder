@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/bookings/presentation/controllers/booking_controller.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_avatar.dart';
@@ -35,62 +36,101 @@ class _CreateBookingPageState extends State<CreateBookingPage> {
   Widget build(BuildContext context) {
     final technician = widget.technician;
     return Scaffold(
-      appBar: AppBar(title: const Text('Book a technician')),
+      appBar: AppBar(title: const Text('Create booking')),
       body: SafeArea(
         child: Form(
           key: _formKey,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
             children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.secondarySoft,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Text(
+                  'QUICK & SECURE BOOKING',
+                  style: TextStyle(
+                    color: AppColors.success,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
                 'Confirm your service',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
               ),
-              const SizedBox(height: 18),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      TechnicianAvatar(
-                        name: technician.name,
-                        imageUrl: technician.imageUrl,
-                        radius: 28,
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              technician.name,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            Text(technician.profession),
-                            const SizedBox(height: 4),
-                            Text(
-                              technician.location,
-                              style: const TextStyle(color: Colors.blueGrey),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.verified_rounded, color: Colors.blue),
-                    ],
+              const SizedBox(height: 6),
+              const Text(
+                'Review your professional, choose a time, and tell us where help is needed.',
+                style: TextStyle(color: AppColors.inkMuted, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(17),
+                decoration: BoxDecoration(
+                  color: AppColors.primarySoft,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.12),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Schedule',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
+                child: Row(
+                  children: [
+                    TechnicianAvatar(
+                      name: technician.name,
+                      imageUrl: technician.imageUrl,
+                      radius: 28,
                     ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            technician.name,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(technician.profession),
+                          const SizedBox(height: 4),
+                          Text(
+                            technician.location,
+                            style: const TextStyle(color: Colors.blueGrey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: AppColors.surface,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.verified_rounded,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 26),
+              const _SectionTitle(
+                icon: Icons.calendar_month_outlined,
+                title: 'Choose a schedule',
               ),
               const SizedBox(height: 10),
               Row(
@@ -121,10 +161,18 @@ class _CreateBookingPageState extends State<CreateBookingPage> {
                   padding: EdgeInsets.only(top: 8),
                   child: Text(
                     'Select a date and time for your service.',
-                    style: TextStyle(color: Colors.blueGrey, fontSize: 12),
+                    style: TextStyle(
+                      color: AppColors.inkMuted,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 24),
+              const _SectionTitle(
+                icon: Icons.home_outlined,
+                title: 'Service details',
+              ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _addressController,
                 textCapitalization: TextCapitalization.sentences,
@@ -151,17 +199,43 @@ class _CreateBookingPageState extends State<CreateBookingPage> {
                   alignLabelWithHint: true,
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 30),
               ListenableBuilder(
                 listenable: widget.controller,
-                builder: (context, _) => FilledButton(
-                  onPressed: widget.controller.isSaving ? null : _submit,
-                  child: widget.controller.isSaving
-                      ? const SizedBox.square(
-                          dimension: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Confirm booking'),
+                builder: (context, _) => DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: widget.controller.isSaving
+                        ? null
+                        : AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: widget.controller.isSaving
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.22),
+                              blurRadius: 18,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                  ),
+                  child: FilledButton.icon(
+                    onPressed: widget.controller.isSaving ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    icon: widget.controller.isSaving
+                        ? const SizedBox.square(
+                            dimension: 21,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.check_circle_outline_rounded),
+                    label: Text(
+                      widget.controller.isSaving
+                          ? 'Creating booking...'
+                          : 'Confirm booking',
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -287,29 +361,62 @@ class _PickerTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       child: Ink(
-        height: 58,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: 62,
+        padding: const EdgeInsets.symmetric(horizontal: 13),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.outline),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primarySoft,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 19),
+            ),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.icon, required this.title});
+
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 18),
+        ),
+        const SizedBox(width: 10),
+        Text(title, style: Theme.of(context).textTheme.titleMedium),
+      ],
     );
   }
 }

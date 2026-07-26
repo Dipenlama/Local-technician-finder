@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/core/widgets/mistrix_logo.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -49,7 +50,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+          padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
           child: Column(
             children: [
               Row(
@@ -58,6 +59,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   const MistrixLogo(compact: true),
                   TextButton(
                     onPressed: widget.onFinished,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.inkMuted,
+                    ),
                     child: const Text('Skip'),
                   ),
                 ],
@@ -90,11 +94,37 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ),
               ),
               const SizedBox(height: 28),
-              FilledButton(
-                onPressed: _next,
-                child: Text(_currentPage == _pages.length - 1
-                    ? 'Get started'
-                    : 'Continue'),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.24),
+                      blurRadius: 22,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: FilledButton(
+                  onPressed: _next,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _currentPage == _pages.length - 1
+                            ? 'Get started'
+                            : 'Continue',
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 20),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -125,31 +155,52 @@ class _OnboardingSlide extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 230,
-          height: 230,
-          decoration: BoxDecoration(
-            color: data.accent.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Container(
-              width: 142,
-              height: 142,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 250,
+              height: 250,
               decoration: BoxDecoration(
-                color: data.accent,
-                borderRadius: BorderRadius.circular(44),
+                color: data.accent.withValues(alpha: 0.07),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: data.accent.withValues(alpha: 0.1),
+                  width: 18,
+                ),
+              ),
+            ),
+            Container(
+              width: 156,
+              height: 156,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [data.accent.withValues(alpha: 0.84), data.accent],
+                ),
+                borderRadius: BorderRadius.circular(46),
                 boxShadow: [
                   BoxShadow(
-                    color: data.accent.withValues(alpha: 0.28),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+                    color: data.accent.withValues(alpha: 0.3),
+                    blurRadius: 34,
+                    offset: const Offset(0, 16),
                   ),
                 ],
               ),
-              child: Icon(data.icon, color: Colors.white, size: 70),
+              child: Icon(data.icon, color: Colors.white, size: 72),
             ),
-          ),
+            Positioned(
+              top: 32,
+              right: 18,
+              child: _Sparkle(color: data.accent, size: 16),
+            ),
+            Positioned(
+              bottom: 28,
+              left: 22,
+              child: _Sparkle(color: data.accent, size: 11),
+            ),
+          ],
         ),
         const SizedBox(height: 48),
         Text(
@@ -170,6 +221,25 @@ class _OnboardingSlide extends StatelessWidget {
               ),
         ),
       ],
+    );
+  }
+}
+
+class _Sparkle extends StatelessWidget {
+  const _Sparkle({required this.color, required this.size});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.34),
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

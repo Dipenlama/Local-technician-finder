@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/home/presentation/pages/about_mistrix_page.dart';
 import 'package:mistrix/features/home/presentation/pages/help_support_page.dart';
 
@@ -24,55 +25,72 @@ class ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
         children: [
-          Text('Profile',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.w900)),
-          const SizedBox(height: 24),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 34,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    child: Text(
-                      _initials(userName),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 27,
-                        fontWeight: FontWeight.w900,
+          Text('Profile', style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(19),
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 34,
+                  backgroundColor: Colors.white.withValues(alpha: 0.18),
+                  child: Text(
+                    _initials(userName),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 27,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 3),
+                      Text(
+                        userEmail,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(userName,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 3),
-                        Text(userEmail,
-                            style: const TextStyle(color: Colors.blueGrey)),
-                      ],
-                    ),
+                ),
+                IconButton(
+                  onPressed: onEditPersonalInformation,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.15),
+                    foregroundColor: Colors.white,
                   ),
-                  IconButton(
-                    onPressed: onEditPersonalInformation,
-                    icon: const Icon(Icons.edit_outlined),
-                  ),
-                ],
-              ),
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 26),
+          const _GroupLabel('Account and preferences'),
+          const SizedBox(height: 10),
           Card(
             child: Column(
               children: [
@@ -98,7 +116,9 @@ class ProfileTab extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 24),
+          const _GroupLabel('Support and information'),
+          const SizedBox(height: 10),
           Card(
             child: Column(
               children: [
@@ -122,13 +142,15 @@ class ProfileTab extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 22),
           OutlinedButton.icon(
             onPressed: onLogout,
             icon: const Icon(Icons.logout_rounded),
             label: const Text('Sign out'),
             style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error),
+              foregroundColor: AppColors.danger,
+              backgroundColor: AppColors.surface,
+            ),
           ),
         ],
       ),
@@ -154,10 +176,41 @@ class _ProfileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      trailing: const Icon(Icons.chevron_right_rounded),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      visualDensity: const VisualDensity(vertical: -2),
+      leading: Container(
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: AppColors.primarySoft,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: AppColors.primary, size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.inkMuted,
+      ),
       onTap: onTap,
+    );
+  }
+}
+
+class _GroupLabel extends StatelessWidget {
+  const _GroupLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: const TextStyle(
+        color: AppColors.inkMuted,
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.8,
+      ),
     );
   }
 }

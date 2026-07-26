@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mistrix/features/technicians/domain/entities/technician.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
@@ -40,7 +41,7 @@ class FavoriteTechniciansPage extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: controller.load,
               child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
                 itemCount: controller.favorites.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
@@ -70,16 +71,36 @@ class _EmptyFavorites extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite_border_rounded, size: 68),
-          SizedBox(height: 16),
-          Text('No favourite technicians', style: TextStyle(fontSize: 18)),
-          SizedBox(height: 6),
-          Text('Tap the heart on a technician to save them.'),
-        ],
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 34),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.outline),
+        ),
+        child: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.favorite_border_rounded,
+              size: 62,
+              color: AppColors.primary,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Build your trusted list',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            SizedBox(height: 6),
+            Text(
+              'Tap the heart on a technician to find them here later.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.inkMuted),
+            ),
+          ],
+        ),
       ),
     );
   }
