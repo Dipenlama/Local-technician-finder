@@ -50,35 +50,6 @@ class DashboardTab extends StatelessWidget {
                     children: [
                       const MistrixLogo(compact: true),
                       const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.outline),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_rounded,
-                              color: AppColors.primary,
-                              size: 17,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Nearby',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       ListenableBuilder(
                         listenable: notificationController,
                         builder: (context, _) => DecoratedBox(
