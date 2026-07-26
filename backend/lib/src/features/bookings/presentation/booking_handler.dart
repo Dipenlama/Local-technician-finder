@@ -4,6 +4,7 @@ import 'package:mistrix_backend/src/core/utils/id_generator.dart';
 import 'package:mistrix_backend/src/features/auth/domain/services/auth_service.dart';
 import 'package:mistrix_backend/src/features/bookings/domain/entities/booking.dart';
 import 'package:mistrix_backend/src/features/bookings/domain/repositories/booking_repository.dart';
+import 'package:mistrix_backend/src/features/notifications/domain/services/notification_service.dart';
 import 'package:mistrix_backend/src/features/technicians/domain/repositories/technician_repository.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -14,15 +15,18 @@ class BookingHandler {
     required BookingRepository bookingRepository,
     required TechnicianRepository technicianRepository,
     required IdGenerator idGenerator,
+    required NotificationService notificationService,
   }) : _authService = authService,
        _bookingRepository = bookingRepository,
        _technicianRepository = technicianRepository,
-       _idGenerator = idGenerator;
+       _idGenerator = idGenerator,
+       _notificationService = notificationService;
 
   final AuthService _authService;
   final BookingRepository _bookingRepository;
   final TechnicianRepository _technicianRepository;
   final IdGenerator _idGenerator;
+  final NotificationService _notificationService;
 
   Router get router {
     final router = Router();
@@ -87,6 +91,13 @@ class BookingHandler {
       technicianImageUrl: technician.imageUrl,
     );
     await _bookingRepository.create(booking);
+    await _notificationService.send(
+      userId: user.id,
+      title: 'Booking requested',
+      message: 'Your booking with ${technician.name} has been submitted.',
+      type: 'booking_created',
+      bookingId: booking.id,
+    );
     return successResponse(booking.toJson(), statusCode: 201);
   }
 
@@ -123,6 +134,24 @@ class BookingHandler {
       status: statusValue == null ? null : BookingStatus.cancelled,
     );
     await _bookingRepository.update(updated);
+    if (statusValue == BookingStatus.cancelled.name) {
+      await _notificationService.send(
+        userId: user.id,
+        title: 'Booking cancelled',
+        message: 'Your booking with ${booking.technicianName} was cancelled.',
+        type: 'booking_cancelled',
+        bookingId: booking.id,
+      );
+    } else {
+      await _notificationService.send(
+        userId: user.id,
+        title: 'Booking rescheduled',
+        message:
+            'Your booking with ${booking.technicianName} has a new schedule.',
+        type: 'booking_rescheduled',
+        bookingId: booking.id,
+      );
+    }
     return successResponse(updated.toJson());
   }
 }

@@ -15,6 +15,8 @@ class MongoDatabase {
   DbCollection get technicians => db.collection('technicians');
   DbCollection get bookings => db.collection('bookings');
   DbCollection get services => db.collection('services');
+  DbCollection get notifications => db.collection('notifications');
+  DbCollection get favorites => db.collection('favorites');
 
   Future<void> close() => db.close();
 }

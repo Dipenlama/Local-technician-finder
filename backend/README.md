@@ -15,7 +15,8 @@ The server starts at `http://localhost:8080` by default.
 
 MongoDB is required. For local development the API connects to
 `mongodb://localhost:27017/mistrix` and automatically creates/seeds the
-`users`, `technicians`, `bookings`, and `services` collections.
+`users`, `technicians`, `bookings`, `services`, `notifications`, and `favorites`
+collections.
 
 ## Environment
 
@@ -38,6 +39,12 @@ Set `MONGODB_URI` to use a different local database or MongoDB Atlas cluster.
 | GET | `/api/v1/bookings` | Bearer token |
 | POST | `/api/v1/bookings` | Bearer token |
 | PUT | `/api/v1/bookings/<id>` | Booking owner bearer token |
+| GET | `/api/v1/notifications` | Bearer token |
+| PUT | `/api/v1/notifications/<id>/read` | Notification owner bearer token |
+| PUT | `/api/v1/notifications/read-all` | Bearer token |
+| GET | `/api/v1/favorites` | Bearer token |
+| PUT | `/api/v1/favorites/<technicianId>` | Bearer token |
+| DELETE | `/api/v1/favorites/<technicianId>` | Bearer token |
 | GET | `/api/v1/admin/bookings` | Admin bearer token |
 | PUT | `/api/v1/admin/bookings/<id>` | Admin bearer token |
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/core/constants/app_constants.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/auth/presentation/widgets/auth_scaffold.dart';
 
 class LoginPage extends StatefulWidget {
@@ -45,8 +46,10 @@ class _LoginPageState extends State<LoginPage> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 labelText: 'Email address',
+                hintText: 'you@example.com',
                 prefixIcon: Icon(Icons.mail_outline_rounded),
               ),
               validator: (value) {
@@ -61,8 +64,11 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               obscureText: _obscurePassword,
               autofillHints: const [AutofillHints.password],
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _isSubmitting ? null : _submit(),
               decoration: InputDecoration(
                 labelText: 'Password',
+                hintText: 'Enter your password',
                 prefixIcon: const Icon(Icons.lock_outline_rounded),
                 suffixIcon: IconButton(
                   onPressed: () =>
@@ -80,65 +86,124 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
             const SizedBox(height: 8),
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 2,
               children: [
-                Checkbox(
-                  value: _rememberMe,
-                  onChanged: (value) =>
-                      setState(() => _rememberMe = value ?? false),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(
+                      value: _rememberMe,
+                      onChanged: (value) =>
+                          setState(() => _rememberMe = value ?? false),
+                    ),
+                    const Text(
+                      'Remember me',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
-                const Text('Remember me'),
-                const Spacer(),
                 TextButton(
                   onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text(
-                            'Password recovery will be connected to the backend.')),
+                      content: Text(
+                        'Password recovery will be connected to the backend.',
+                      ),
+                    ),
                   ),
                   child: const Text('Forgot password?'),
                 ),
               ],
             ),
             const SizedBox(height: 14),
-            FilledButton(
-              onPressed: _isSubmitting ? null : _submit,
-              child: _isSubmitting
-                  ? const SizedBox.square(
-                      dimension: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Sign in'),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
+            DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer
-                    .withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(14),
+                gradient: _isSubmitting ? null : AppColors.primaryGradient,
+                color: _isSubmitting ? AppColors.outline : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: _isSubmitting
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.28),
+                          blurRadius: 20,
+                          offset: const Offset(0, 9),
+                        ),
+                      ],
+              ),
+              child: FilledButton.icon(
+                onPressed: _isSubmitting ? null : _submit,
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  disabledBackgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                icon: _isSubmitting
+                    ? const SizedBox.square(
+                        dimension: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.inkMuted,
+                        ),
+                      )
+                    : const Icon(Icons.login_rounded),
+                label: Text(_isSubmitting ? 'Signing in...' : 'Sign in'),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(13),
+              decoration: BoxDecoration(
+                color: AppColors.primarySoft.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                ),
               ),
               child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.admin_panel_settings_outlined, size: 20),
-                  SizedBox(width: 9),
+                  _AdminIcon(),
+                  SizedBox(width: 11),
                   Expanded(
-                    child: Text(
-                      'Admin demo: ${AppConstants.adminEmail} / ${AppConstants.adminPassword}',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ADMIN DEMO',
+                          style: TextStyle(
+                            color: AppColors.primaryDark,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          '${AppConstants.adminEmail}  •  ${AppConstants.adminPassword}',
+                          style: TextStyle(
+                            color: AppColors.inkMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text("Don't have an account?"),
+                const Text(
+                  "New to Mistrix?",
+                  style: TextStyle(color: AppColors.inkMuted),
+                ),
                 TextButton(
                   onPressed: widget.onCreateAccount,
                   child: const Text('Create account'),
@@ -166,5 +231,26 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     }
+  }
+}
+
+class _AdminIcon extends StatelessWidget {
+  const _AdminIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Icon(
+        Icons.admin_panel_settings_outlined,
+        color: AppColors.primary,
+        size: 20,
+      ),
+    );
   }
 }

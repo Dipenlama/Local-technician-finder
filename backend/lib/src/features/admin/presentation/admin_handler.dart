@@ -4,6 +4,7 @@ import 'package:mistrix_backend/src/core/errors/api_exception.dart';
 import 'package:mistrix_backend/src/core/http/api_response.dart';
 import 'package:mistrix_backend/src/features/auth/domain/services/auth_service.dart';
 import 'package:mistrix_backend/src/features/technicians/data/repositories/mongo_technician_repository.dart';
+import 'package:mistrix_backend/src/features/notifications/domain/services/notification_service.dart';
 import 'package:mistrix_backend/src/features/technicians/domain/entities/technician.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
@@ -14,11 +15,13 @@ class AdminHandler {
     required this.database,
     required this.authService,
     required this.technicians,
+    required this.notificationService,
   });
 
   final MongoDatabase database;
   final AuthService authService;
   final MongoTechnicianRepository technicians;
+  final NotificationService notificationService;
 
   Router get router {
     final router = Router();
@@ -186,6 +189,44 @@ class AdminHandler {
           ..['scheduledAt'] = scheduledAt.toUtc()
           ..['updatedAt'] = DateTime.now().toUtc();
     await database.bookings.replaceOne(where.eq('_id', id), updated);
+    final customerId = existing['customerId'] as String;
+    if (status != existing['status']) {
+      final event = switch (status) {
+        'completed' => (
+          'Booking completed',
+          'Your ${existing['service']} booking has been marked complete.',
+          'booking_completed',
+        ),
+        'cancelled' => (
+          'Booking cancelled',
+          'Your ${existing['service']} booking was cancelled by the admin.',
+          'booking_cancelled',
+        ),
+        'confirmed' => (
+          'Booking confirmed',
+          'Your ${existing['service']} booking has been confirmed.',
+          'booking_confirmed',
+        ),
+        _ => null,
+      };
+      if (event != null) {
+        await notificationService.send(
+          userId: customerId,
+          title: event.$1,
+          message: event.$2,
+          type: event.$3,
+          bookingId: id,
+        );
+      }
+    } else if (scheduledAt != existing['scheduledAt']) {
+      await notificationService.send(
+        userId: customerId,
+        title: 'Booking rescheduled',
+        message: 'Your ${existing['service']} booking has a new schedule.',
+        type: 'booking_rescheduled',
+        bookingId: id,
+      );
+    }
     return successResponse(await _bookingResponse(updated));
   }
 

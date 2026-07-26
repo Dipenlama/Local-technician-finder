@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mistrix/core/errors/app_exception.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/auth/data/auth_api_service.dart';
 
 class PersonalInformationPage extends StatefulWidget {
@@ -53,21 +54,46 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
         child: Form(
           key: _formKey,
           child: ListView(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
               Center(
-                child: CircleAvatar(
-                  radius: 45,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.primary,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppColors.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        blurRadius: 22,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const CircleAvatar(
+                    radius: 43,
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 44,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 16),
+              const Text(
+                'Keep your details up to date',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'These details help technicians identify and contact you.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.inkMuted),
+              ),
+              const SizedBox(height: 26),
               TextFormField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,

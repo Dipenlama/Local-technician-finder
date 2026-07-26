@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/core/widgets/mistrix_logo.dart';
 import 'package:mistrix/features/admin/domain/entities/admin_service.dart';
 import 'package:mistrix/features/admin/presentation/controllers/admin_controller.dart';
@@ -42,7 +43,7 @@ class DashboardTab extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
               sliver: SliverList.list(
                 children: [
                   Row(
@@ -51,24 +52,36 @@ class DashboardTab extends StatelessWidget {
                       const Spacer(),
                       ListenableBuilder(
                         listenable: notificationController,
-                        builder: (context, _) => IconButton.filledTonal(
-                          onPressed: onNotifications,
-                          icon: Badge.count(
-                            count: notificationController.unreadCount,
-                            isLabelVisible:
-                                notificationController.unreadCount > 0,
-                            child: const Icon(
-                              Icons.notifications_none_rounded,
+                        builder: (context, _) => DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppColors.outline),
+                          ),
+                          child: IconButton(
+                            onPressed: onNotifications,
+                            icon: Badge.count(
+                              count: notificationController.unreadCount,
+                              isLabelVisible:
+                                  notificationController.unreadCount > 0,
+                              child: const Icon(
+                                Icons.notifications_none_rounded,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 26),
-                  Text('Good morning, $userName 👋',
-                      style: Theme.of(context).textTheme.bodyLarge),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Good morning, $userName 👋',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.inkMuted,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
                   Text(
                     'What service do you need?',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -76,64 +89,109 @@ class DashboardTab extends StatelessWidget {
                           letterSpacing: -0.5,
                         ),
                   ),
-                  const SizedBox(height: 18),
-                  InkWell(
-                    onTap: onExplore,
-                    borderRadius: BorderRadius.circular(16),
-                    child: const IgnorePointer(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search for a service',
-                          prefixIcon: Icon(Icons.search_rounded),
-                          suffixIcon: Icon(Icons.tune_rounded),
+                  const SizedBox(height: 20),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x1024315E),
+                          blurRadius: 18,
+                          offset: Offset(0, 7),
+                        ),
+                      ],
+                    ),
+                    child: InkWell(
+                      onTap: onExplore,
+                      borderRadius: BorderRadius.circular(18),
+                      child: const IgnorePointer(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'What needs fixing today?',
+                            prefixIcon: Icon(Icons.search_rounded),
+                            suffixIcon: Icon(Icons.tune_rounded),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 22),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3157D5), Color(0xFF5679EA)],
+                  const SizedBox(height: 24),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(26),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(22, 22, 16, 22),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(26),
                       ),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
+                        children: [
+                          const Positioned(
+                            right: -42,
+                            top: -66,
+                            child: _PromoCircle(size: 150),
+                          ),
+                          const Positioned(
+                            right: 52,
+                            bottom: -58,
+                            child: _PromoCircle(size: 110),
+                          ),
+                          Row(
                             children: [
-                              const Text(
-                                'First booking offer',
-                                style: TextStyle(color: Colors.white70),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'WELCOME OFFER',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 7),
+                                    const Text(
+                                      'Save 20% on your\nfirst service',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 21,
+                                        height: 1.2,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    FilledButton.tonal(
+                                      onPressed: onExplore,
+                                      style: FilledButton.styleFrom(
+                                        minimumSize: const Size(118, 40),
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: AppColors.primaryDark,
+                                      ),
+                                      child: const Text('Book now'),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 5),
-                              const Text(
-                                'Get 20% off your first service',
-                                style: TextStyle(
+                              Container(
+                                width: 78,
+                                height: 78,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.16),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                child: const Icon(
+                                  Icons.home_repair_service_rounded,
                                   color: Colors.white,
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w800,
+                                  size: 43,
                                 ),
-                              ),
-                              const SizedBox(height: 13),
-                              FilledButton.tonal(
-                                onPressed: onExplore,
-                                style: FilledButton.styleFrom(
-                                  minimumSize: const Size(120, 40),
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: const Color(0xFF3157D5),
-                                ),
-                                child: const Text('Book now'),
                               ),
                             ],
                           ),
-                        ),
-                        const Icon(Icons.home_repair_service_rounded,
-                            color: Colors.white, size: 76),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -146,7 +204,7 @@ class DashboardTab extends StatelessWidget {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               sliver: ListenableBuilder(
                 listenable: adminController,
                 builder: (context, _) {
@@ -158,7 +216,7 @@ class DashboardTab extends StatelessWidget {
                       crossAxisCount: 3,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.92,
+                      childAspectRatio: 0.9,
                     ),
                     itemBuilder: (context, index) => ServiceCategory(
                       data: categories[index],
@@ -169,7 +227,7 @@ class DashboardTab extends StatelessWidget {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 28, 18, 14),
+              padding: const EdgeInsets.fromLTRB(20, 30, 20, 14),
               sliver: SliverToBoxAdapter(
                 child: _SectionHeader(
                     title: 'Top technicians',
@@ -189,7 +247,7 @@ class DashboardTab extends StatelessWidget {
                   );
                 }
                 return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
                   sliver: SliverList.separated(
                     itemCount: controller.technicians.take(3).length,
                     itemBuilder: (context, index) => TechnicianCard(
@@ -323,6 +381,24 @@ class _SectionHeader extends StatelessWidget {
         const Spacer(),
         TextButton(onPressed: onTap, child: Text(action)),
       ],
+    );
+  }
+}
+
+class _PromoCircle extends StatelessWidget {
+  const _PromoCircle({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

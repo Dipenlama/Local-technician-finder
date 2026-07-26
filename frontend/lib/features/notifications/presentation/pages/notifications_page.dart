@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/notifications/domain/entities/app_notification.dart';
 import 'package:mistrix/features/notifications/presentation/controllers/notification_controller.dart';
 
@@ -47,7 +48,7 @@ class NotificationsPage extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: controller.load,
               child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
                 itemCount: controller.notifications.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
@@ -78,16 +79,25 @@ class _NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _colorFor(notification.type);
     return Card(
-      color: notification.isRead
-          ? null
-          : Theme.of(context).colorScheme.primaryContainer.withValues(
-                alpha: 0.45,
-              ),
+      color: notification.isRead ? null : AppColors.primarySoft,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: notification.isRead
+              ? AppColors.outline
+              : AppColors.primary.withValues(alpha: 0.2),
+        ),
+      ),
       child: ListTile(
         onTap: onTap,
-        contentPadding: const EdgeInsets.all(14),
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.14),
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(15),
+          ),
           child: Icon(_iconFor(notification.type), color: color),
         ),
         title: Row(
@@ -118,7 +128,11 @@ class _NotificationCard extends StatelessWidget {
               const SizedBox(height: 7),
               Text(
                 _formatTime(notification.createdAt),
-                style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.inkMuted,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -136,11 +150,11 @@ class _NotificationCard extends StatelessWidget {
       };
 
   Color _colorFor(String type) => switch (type) {
-        'booking_completed' => Colors.green,
-        'booking_cancelled' => Colors.red,
-        'booking_rescheduled' => Colors.orange,
-        'booking_confirmed' => Colors.blue,
-        _ => const Color(0xFF3157D5),
+        'booking_completed' => AppColors.success,
+        'booking_cancelled' => AppColors.danger,
+        'booking_rescheduled' => AppColors.warning,
+        'booking_confirmed' => AppColors.primary,
+        _ => AppColors.secondary,
       };
 
   String _formatTime(DateTime value) {
@@ -159,16 +173,36 @@ class _EmptyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.notifications_none_rounded, size: 68),
-          SizedBox(height: 16),
-          Text('No notifications yet', style: TextStyle(fontSize: 18)),
-          SizedBox(height: 6),
-          Text('Booking updates will appear here.'),
-        ],
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 34),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.outline),
+        ),
+        child: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.notifications_none_rounded,
+              size: 62,
+              color: AppColors.primary,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'You are all caught up',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            SizedBox(height: 6),
+            Text(
+              'Booking updates and important alerts will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.inkMuted),
+            ),
+          ],
+        ),
       ),
     );
   }

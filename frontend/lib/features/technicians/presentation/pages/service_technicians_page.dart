@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 import 'package:mistrix/features/technicians/domain/use_cases/get_technicians.dart';
 import 'package:mistrix/features/technicians/presentation/controllers/technician_controller.dart';
 import 'package:mistrix/features/technicians/presentation/widgets/technician_card.dart';
@@ -66,10 +67,10 @@ class _ServiceTechniciansPageState extends State<ServiceTechniciansPage> {
               TechnicianStatus.success => RefreshIndicator(
                   onRefresh: () => _controller.load(query: widget.query),
                   child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
                     itemCount: _controller.technicians.length + 1,
                     separatorBuilder: (_, index) =>
-                        SizedBox(height: index == 0 ? 18 : 10),
+                        SizedBox(height: index == 0 ? 20 : 12),
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return _ResultsHeader(
@@ -113,6 +114,23 @@ class _ResultsHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+          decoration: BoxDecoration(
+            color: AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Text(
+            '$count ${count == 1 ? 'EXPERT' : 'EXPERTS'} AVAILABLE',
+            style: const TextStyle(
+              color: AppColors.primaryDark,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.7,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         Text(
           '$serviceName technicians',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -122,7 +140,7 @@ class _ResultsHeader extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           '$count trusted ${count == 1 ? 'professional' : 'professionals'} found near you.',
-          style: TextStyle(color: Colors.blueGrey.shade600),
+          style: const TextStyle(color: AppColors.inkMuted),
         ),
       ],
     );

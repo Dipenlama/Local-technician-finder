@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mistrix/core/theme/app_colors.dart';
 
 class MistrixLogo extends StatelessWidget {
   const MistrixLogo({this.compact = false, super.key});
@@ -14,8 +15,15 @@ class MistrixLogo extends StatelessWidget {
           width: compact ? 38 : 48,
           height: compact ? 38 : 48,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
+            gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(compact ? 12 : 15),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.22),
+                blurRadius: 16,
+                offset: const Offset(0, 7),
+              ),
+            ],
           ),
           child: Icon(
             Icons.handyman_rounded,
@@ -29,6 +37,7 @@ class MistrixLogo extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w900,
                 letterSpacing: -1,
+                color: AppColors.ink,
               ),
         ),
       ],
